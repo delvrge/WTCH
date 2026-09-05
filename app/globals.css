@@ -1,0 +1,2252 @@
+/* Black / white / gray only, plus one red accent (buttons, active states,
+   errors) reused from the status-dot palette below. Difference is mostly
+   carried by weight, border and position — hue is reserved for the accent
+   and for the deliberate status-color exceptions called out inline.
+   Shapes lean soft: pill controls/badges, rounded cards, generous padding,
+   small type scale. Content surfaces (cards, inputs, the nav bar) sit on a
+   dedicated page canvas a shade off from them, so they read as raised. */
+
+/* Dark is the default. `data-theme` on <html> is set before first paint by the
+   inline script in layout.tsx, so there is no flash on load. */
+
+:root,
+:root[data-theme="dark"] {
+  --bg: #181a1b;
+  --canvas: #131415;
+  --fg: #ededed;
+  --muted: #8f8f8f;
+  --faint: #6b6b6b;
+  --border: #262626;
+  --border-strong: #3f3f3f;
+  --surface: #151515;
+  --panel: var(--surface);
+  /* Dedicated flat-button fill — --surface is tuned as a subtle hover tint
+     (~11 units off --bg) and reads as basically invisible as a standalone
+     button fill, especially in dark mode where that's too small a luminance
+     step to notice. This is a real, deliberate step up from --bg instead. */
+  --btn-bg: #262626;
+  --fg-hard: #ffffff;
+  --overlay: rgba(0, 0, 0, 0.6);
+  /* The one deliberate exception to the black/white/gray rule above: a link
+     inside reply text needs to read as a link at a glance (the operator is
+     about to paste it into a real customer reply), not just as underlined
+     body text. */
+  --link: #5b9dff;
+  /* The brand/action accent — reused from --chip-bug / the escalated status
+     dot below, so "red" means one consistent thing everywhere it shows up:
+     primary buttons, active states, errors. */
+  --accent: #b91c1c;
+  --accent-hover: #dc2626;
+  --accent-fg: #ffffff;
+  --accent-soft-bg: rgba(185, 28, 28, 0.18);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --pad: 16px;
+  --pad-lg: 20px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --canvas: #f1f1f4;
+  --fg: #111111;
+  --muted: #6f6f6f;
+  --faint: #949494;
+  --border: #e3e3e3;
+  --border-strong: #bdbdbd;
+  --surface: #fafafa;
+  --panel: var(--surface);
+  --btn-bg: #e4e4e4;
+  --fg-hard: #000000;
+  --overlay: rgba(17, 17, 17, 0.35);
+  --link: #1a56db;
+  --accent: #b91c1c;
+  --accent-hover: #991b1b;
+  --accent-fg: #ffffff;
+  --accent-soft-bg: rgba(185, 28, 28, 0.1);
+  --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 6px 20px rgba(20, 20, 30, 0.08);
+}
+
+/* The browser paints form controls and scrollbars from this. */
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Scrollbar styling for both themes. WebKit browsers (Chrome, Safari, Edge)
+   support ::webkit-scrollbar pseudo-elements; scrollbar-color/scrollbar-width
+   are standard but have limited browser support and fewer styling options. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 5px;
+  border: 2px solid var(--canvas);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* The page canvas — every card/input/nav/modal sits on top of this in
+     --bg, a shade brighter (light theme) or a shade darker (dark theme), so
+     content reads as raised off the page instead of flush with it. */
+  background: var(--canvas);
+  color: var(--fg);
+  font-family: var(--font-source-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── layout ─────────────────────────────────────────────────────────────── */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+.nav-logo {
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: var(--fg-hard);
+  flex: 0 0 auto;
+}
+
+.nav-links {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  transform: translateX(5px);
+}
+
+.nav-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nav a:hover {
+  color: var(--fg);
+}
+
+.nav a.active {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+/* Sign out — scoped to the nav so this doesn't touch .btn.quiet elsewhere
+   (Remove/Cancel row actions). */
+.nav .btn.quiet {
+  color: #ffffff;
+  background: rgb(34, 34, 34);
+}
+
+.nav .btn.quiet:hover:not(:disabled) {
+  background: rgb(50, 50, 50);
+}
+
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.page-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.page-head .spacer {
+  flex: 1;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* For rows where the leading item can wrap to multiple lines (e.g. a long
+   thread title): pins the trailing chip/date to the top instead of it
+   drifting to the vertical center of the wrapped title. */
+.row-top {
+  align-items: flex-start;
+}
+
+/* For rows mixing a labeled field (label + input, taller) with unlabeled
+   controls (buttons) that should sit flush with the input, not the label. */
+.row-end {
+  align-items: flex-end;
+}
+
+.grow {
+  flex: 1;
+  min-width: 160px;
+}
+
+/* A second input sharing a row with a .grow one: fixed, narrower width so
+   it doesn't compete for space, e.g. the Dashboard's keyword box beside the
+   full post-title input. */
+.keyword-input {
+  flex: 0 0 180px;
+  width: 180px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* ── controls ───────────────────────────────────────────────────────────── */
+
+/* Filled pill with a visible outline — same schema as Adobe Community's
+   "Explore now" button (light fill, dark border ring). .btn.primary below
+   is the solid-black counterpart, same idea as their "+ Create a post" pill. */
+.btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--btn-bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  padding: 7px 20px;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--border-strong);
+}
+
+.btn:disabled {
+  color: var(--faint);
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Solid black pill (fg/bg invert), matching Adobe Community's "+ Create a
+   post" button exactly — that reference has no red in it at all. Red is
+   reserved for status/error meaning elsewhere (errors, escalated, badges),
+   not for this button. */
+.btn.primary {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: var(--fg-hard);
+  border-color: var(--fg-hard);
+}
+
+.btn.primary:disabled {
+  background: var(--faint);
+  border-color: var(--faint);
+  color: var(--bg);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: var(--surface);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: -1px;
+}
+
+.bell-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.bell-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  position: relative;
+}
+
+.bell-btn:hover {
+  background: var(--surface);
+}
+
+.bell-btn:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: -1px;
+}
+
+.bell-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+
+.bell-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  z-index: 30;
+}
+
+.bell-dropdown-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bell-dropdown-item {
+  display: block;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--fg);
+  font-size: 13px;
+}
+
+.bell-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.bell-dropdown-item:hover {
+  background: var(--surface);
+}
+
+.bell-dropdown-empty {
+  padding: 14px 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.case-row-highlight {
+  animation: case-row-flash 2.4s ease-out 1;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--fg);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: -2px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-lg {
+  width: 20px;
+  height: 20px;
+  border-width: 3px;
+  vertical-align: -4px;
+}
+
+.investigating-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 32px 0;
+}
+
+@keyframes case-row-flash {
+  0% {
+    background: var(--accent-faint, rgba(120, 170, 255, 0.28));
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.btn.quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+  padding: 4px 10px;
+}
+
+.btn.quiet:hover:not(:disabled) {
+  color: var(--fg);
+  background: var(--surface);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  font: inherit;
+  font-size: 13px;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.btn:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: -1px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Wraps a search input so the ⌘K hint can sit inside it, right-aligned. */
+.input-kbd-wrap {
+  position: relative;
+}
+
+.input-kbd-wrap input {
+  padding-right: 46px;
+}
+
+/* The native type="search" clear button would otherwise sit under the hint. */
+.input-kbd-wrap input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* Adobe-Community-style focus: instead of an outline on the input, everything
+   else on the page dims and the search bar stays lit above the dim layer. */
+.page-dim {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  z-index: 40;
+  pointer-events: none;
+  animation: page-dim-in 0.15s ease;
+}
+
+@keyframes page-dim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.search-bar-row {
+  position: relative;
+  z-index: 41;
+}
+
+.input-kbd-wrap.dim-on-focus input:focus {
+  outline: none;
+}
+
+.kbd-hint {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--faint);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.field > label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.field-inline {
+  flex: 1;
+  min-width: 220px;
+}
+
+/* Search box that owns its own row above the filter controls: taller and
+   slightly larger type than the selects it sits over, so it reads as the
+   primary control rather than one more dropdown. */
+.input-lg {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.segmented button {
+  font: inherit;
+  font-size: 13px;
+  background: var(--bg);
+  color: var(--muted);
+  border: 0;
+  border-right: 1px solid var(--border);
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.segmented button:last-child {
+  border-right: 0;
+}
+
+.segmented button.active {
+  background: var(--accent);
+  color: var(--accent-fg);
+  font-weight: 600;
+}
+
+/* ── text ───────────────────────────────────────────────────────────────── */
+
+.meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.meta-link-btn {
+  font: inherit;
+  color: var(--link);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.meta-link-btn:hover {
+  color: var(--accent);
+}
+
+.meta-strong {
+  font-size: 12px;
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.error {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  border-left: 2px solid var(--accent);
+  padding-left: 8px;
+}
+
+.empty {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Squared-off badge (moderate rounded-rect, not a full pill) — matches
+   Adobe Community's "Correct answer" badge shape. */
+.chip {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 10px;
+  white-space: nowrap;
+}
+
+/* The one deliberate exception to the grayscale rule at the top of this
+   file: community board chips carry meaning by category, so hue is used
+   here on purpose. Soft tint + solid text (not a solid fill) so it reads
+   as a badge, not a warning label — matches the reply-status pills below. */
+.chip-bug {
+  background: rgba(185, 28, 28, 0.14);
+  color: #dc2626;
+  border-color: rgba(185, 28, 28, 0.35);
+  font-weight: 600;
+}
+
+.chip-question {
+  background: rgba(180, 83, 9, 0.14);
+  color: #d97706;
+  border-color: rgba(180, 83, 9, 0.35);
+  font-weight: 600;
+}
+
+.chip-feature {
+  background: rgba(109, 40, 217, 0.14);
+  color: #8b5cf6;
+  border-color: rgba(109, 40, 217, 0.35);
+  font-weight: 600;
+}
+
+/* Dashboard's tag picker — plain .chip made clickable, no checkbox. Toggled
+   state is the only thing that distinguishes a pick from the rest. */
+.tag-chip {
+  cursor: pointer;
+  padding: 3px 9px;
+  font-size: 12px;
+  background: var(--bg);
+}
+
+.tag-chip:hover {
+  border-color: var(--border-strong);
+}
+
+.tag-chip-selected {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+}
+
+.body-text {
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* A drafted reply is editable before it's copied or saved — same type scale
+   as .body-text so turning it into a textarea doesn't visually demote it. */
+.reply-edit {
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 60px;
+}
+
+/* A saved reply's answer_html, rendered read-only — same rules as .rte-content
+   below minus the editing chrome, so a formatted reply looks the same open
+   or closed. */
+.reply-rich {
+  font-size: 13px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+
+/* ── rich-text reply editor ────────────────────────────────────────────────
+   A plain contenteditable div driven by document.execCommand (see
+   components/RichTextEditor.tsx and lib/richText.ts) — same approach as
+   Phraseory's macro editor. No external icon font: B/I/U are styled glyphs,
+   everything else is an inline SVG, so this carries no font dependency. */
+.rte {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.rte-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+
+.rte-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.rte-btn:hover {
+  background: var(--bg);
+  border-color: var(--border-strong);
+}
+
+.rte-btn:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 1px;
+}
+
+.rte-btn-b { font-weight: 700; }
+.rte-btn-i { font-style: italic; }
+.rte-btn-u { text-decoration: underline; }
+
+.rte-sep {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--border-strong);
+}
+
+.rte-content {
+  min-height: 80px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.rte-content:focus {
+  outline: none;
+}
+
+.rte-content:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.rte-content ol,
+.rte-content ul,
+.reply-rich ol,
+.reply-rich ul {
+  padding-left: 22px;
+  margin: 6px 0;
+}
+
+.rte-content code,
+.reply-rich code {
+  background: var(--surface);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.92em;
+  font-family: ui-monospace, monospace;
+}
+
+.rte-content a,
+.reply-rich a {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+.rte-content img,
+.reply-rich img {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  display: block;
+}
+
+.rte-img-wrap {
+  margin: 10px 0;
+}
+
+/* Checkbox list standing in for a native multi-select — used for both the
+   Add/Edit form's "Linked cases" field and the per-row "Linked cases"
+   modal, so a reply can point at more than one case without needing
+   ctrl/cmd-click to pick several. */
+.case-multiselect {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  background: var(--bg);
+}
+
+.case-multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 2px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.case-multiselect-option:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.case-multiselect-filter {
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+/* One-click shortcut above the checkbox list: the most recently added open
+   case, so linking it doesn't require typing into the search box first. */
+.case-multiselect-suggestion {
+  text-align: left;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.case-multiselect-suggestion:hover {
+  border-style: solid;
+  color: var(--fg);
+}
+
+/* Library's "Link a reply" picker reuses .case-multiselect's scroll box,
+   but each row is a result to act on (title/snippet + a Link button), not
+   a checkbox — spread apart instead of hugging left. */
+.link-reply-option {
+  justify-content: space-between;
+  cursor: default;
+}
+
+/* ── login ──────────────────────────────────────────────────────────────── */
+
+.login {
+  /* Always light, regardless of the active theme — this screen is shown
+     before sign-in, so it shouldn't follow --data-theme. */
+  --bg: #ffffff;
+  --canvas: #f1f1f4;
+  --fg: #111111;
+  --muted: #6f6f6f;
+  --faint: #949494;
+  --border: #e3e3e3;
+  --border-strong: #bdbdbd;
+  --surface: #fafafa;
+  --panel: var(--surface);
+  --btn-bg: #e4e4e4;
+  --fg-hard: #000000;
+  --overlay: rgba(17, 17, 17, 0.35);
+  --link: #1a56db;
+  --accent: #b91c1c;
+  --accent-hover: #991b1b;
+  --accent-fg: #ffffff;
+  --accent-soft-bg: rgba(185, 28, 28, 0.1);
+  --shadow: 0 1px 2px rgba(20, 20, 30, 0.04), 0 6px 20px rgba(20, 20, 30, 0.08);
+  color-scheme: light;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login form {
+  width: 100%;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── cards ──────────────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.card.clickable {
+  cursor: pointer;
+}
+
+.card.clickable:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  padding-right: 28px;
+  word-break: break-word;
+}
+
+.new-tile {
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: var(--pad);
+  min-height: 104px;
+  cursor: pointer;
+}
+
+.new-tile:hover {
+  color: var(--fg);
+  border-style: solid;
+}
+
+/* ── menu ───────────────────────────────────────────────────────────────── */
+
+.menu-wrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.menu-trigger {
+  font: inherit;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  padding: 3px 7px;
+  cursor: pointer;
+}
+
+.menu-trigger:hover {
+  color: var(--fg);
+  border-color: var(--border);
+}
+
+.menu {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  z-index: 20;
+  min-width: 132px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu button {
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.menu button:hover {
+  background: var(--surface);
+}
+
+/* ── modal ──────────────────────────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--overlay);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px;
+  overflow-y: auto;
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--pad-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── board ──────────────────────────────────────────────────────────────── */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (max-width: 800px) {
+  .split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.split-6040 {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .split-6040 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cluster-card {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.cluster-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.cluster-card.active {
+  border-color: var(--fg);
+  border-width: 1px;
+  background: var(--surface);
+  transform: none;
+}
+
+.cluster-card-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.detail {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: var(--pad-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pattern-row {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.pattern-row:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.pattern-row.rejected {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.pattern-row-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── replies ────────────────────────────────────────────────────────────── */
+
+.reply {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reply-grounding {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.grounding-toggle {
+  font: inherit;
+  font-size: 12px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--border-strong);
+  padding: 0;
+  cursor: pointer;
+}
+
+.grounding-toggle:hover {
+  color: var(--fg);
+}
+
+.excerpt {
+  font-size: 12px;
+  color: var(--fg);
+  border-left: 2px solid var(--border-strong);
+  padding-left: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.excerpt mark {
+  background: var(--fg);
+  color: var(--bg);
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* ── list rows ──────────────────────────────────────────────────────────── */
+
+.list-row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 12px var(--pad);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.list-row .grow {
+  flex: 1;
+  min-width: 160px;
+}
+
+.row-title {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.num {
+  font-size: 12px;
+  color: var(--faint);
+  min-width: 18px;
+}
+
+.doc {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: var(--pad);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── context: categorization tracker ───────────────────────────────────── */
+
+.topic-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topic-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.topic-group-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+}
+
+/* Nested under a topic — indented and lighter-weight so the topic > subtopic
+   relationship reads visually, not just via a container box. */
+.category-row-sub {
+  margin-left: 14px;
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.category-row-label {
+  font-size: 13px;
+  word-break: break-word;
+}
+
+.category-row-pending {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+/* auto-fill + a minmax floor sizes columns off the grid's own container
+   width, not the viewport — so this stays proper evenly-spaced rectangles
+   whether it's the only thing on the row (full page width) or squeezed into
+   half of it next to Gaps (see Context page). A fixed column count tied to
+   viewport breakpoints doesn't know it's been squeezed and just cramps every
+   column instead of dropping one. */
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.topic-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  background: var(--bg);
+  color: inherit;
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 96px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.topic-box:hover {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  transform: translateY(-1px);
+}
+
+.topic-box-empty {
+  border-style: dashed;
+  cursor: default;
+  color: var(--muted);
+}
+
+.topic-box-empty:hover {
+  transform: none;
+}
+
+.topic-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.topic-box-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  flex: 1;
+  word-break: break-word;
+}
+
+/* ── cases ──────────────────────────────────────────────────────────────── */
+
+.case-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow-x: auto;
+}
+
+/* Library's case list — one card per case (post-card layout) instead of a
+   dense table row, so it holds a variable-height reply preview without the
+   fixed-row-height table's clamping/truncation tricks. The Context page's
+   Gaps table below is unrelated and still a plain <table>. */
+.case-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.case-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad-lg);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.case-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.case-card-num {
+  font-size: 12px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.case-card-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.case-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  word-break: break-word;
+  min-width: 0;
+}
+
+.case-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.case-card-meta .case-status {
+  margin-left: auto;
+  width: auto;
+  min-width: 160px;
+}
+
+/* Separated from the rest of the card, same idea as Adobe's own reply box
+   sitting below a divider under the post. Verified gets the same "confirmed
+   good" green ring used on the Replies page's verified boxes. */
+.case-card-reply {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.case-card-reply-verified {
+  border-top-color: transparent;
+  padding: 10px;
+  margin-top: -1px;
+  border: 1px solid #15803d;
+  border-radius: var(--radius-sm);
+  background: rgba(21, 128, 61, 0.06);
+}
+
+/* Still used by the Context page's Gaps table (Library moved to the card
+   layout above). table-layout: fixed + the <colgroup> percentage widths are
+   what stop the browser from auto-sizing columns to content; min-width is a
+   readability floor for narrow viewports, with overflow-x: auto above as
+   the safety net below that floor. */
+.case-table {
+  width: 100%;
+  min-width: 640px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.case-table th,
+.case-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.case-table th {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.case-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.case-table td.case-id {
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.case-table td.case-title {
+  font-weight: 600;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.case-topic-chip {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.case-link {
+  font-size: 12px;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+.case-link-missing {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Click-to-edit affordances (link/title overrides) — styled as an underlined
+   link rather than a bare "Edit" caption or a bordered button, so it reads
+   as clickable at a glance without adding a color the theme doesn't already
+   use. Deliberately distinct from .btn.quiet, which is for lower-emphasis
+   row actions (Remove) that don't need this level of visibility. */
+.case-edit-link {
+  display: block;
+  margin-top: 2px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fg);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.case-edit-link:hover {
+  color: var(--fg-hard);
+}
+
+.case-edit-link:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+/* Title's edit affordance: a text label next to the title competes with the
+   title itself for attention, so this is a small always-visible icon button
+   sitting inline next to the title text instead of a caption underneath it. */
+.case-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.case-edit-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  padding: 0;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.case-edit-icon-btn:hover {
+  color: var(--fg);
+  background: var(--surface);
+}
+
+.case-edit-icon-btn:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.case-recheck {
+  color: var(--muted);
+}
+
+/* Reply-status chip — links to /replies, so the case row is also the
+   jumping-off point for writing or reviewing that case's reply, not just a
+   status readout. */
+.reply-status {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.reply-status-none {
+  color: var(--muted);
+}
+
+/* Soft-tint pills (background rgba over solid text) rather than solid
+   fills, matching .chip-bug/.chip-question/.chip-feature above — same
+   amber/green hues, just a badge instead of a warning label. */
+.reply-status-unverified {
+  background: rgba(202, 138, 4, 0.16);
+  color: #ca8a04;
+  border-color: rgba(202, 138, 4, 0.4);
+  font-weight: 600;
+}
+
+.reply-status-verified {
+  background: #15803d;
+  color: #ffffff;
+  border-color: #15803d;
+  font-weight: 600;
+}
+
+/* More than one reply linked to this case — the chip still points at just
+   one (verified beats draft, ties go oldest), this is only a hint that
+   there's more behind it. */
+.reply-status-count {
+  margin-left: 4px;
+  opacity: 0.85;
+  font-size: 11px;
+}
+
+/* Reply preview — no box/background, just the snippet itself, using
+   whatever width the Reply column gives it (widened when Remove moved to
+   the left). Overflowing text fades out at the bottom edge (mask-image)
+   instead of a hard cut. */
+.reply-preview-card {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Unread is a left accent, not a box — the box itself is gone. */
+.reply-preview-card-unread .reply-preview-card-body {
+  border-left: 2px solid #f97316;
+  padding-left: 8px;
+}
+
+.reply-preview-card-body {
+  display: block;
+  padding: 2px 0;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.reply-preview-card-head {
+  margin-bottom: 4px;
+}
+
+/* Capped at ~3 lines, not a fixed height — a short reply stays short, a
+   long one fades out at the bottom instead of stretching its row to match
+   its longest neighbor. */
+.reply-preview-card-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--muted);
+  max-height: 42px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.reply-preview-card-unread-btn {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: none;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f97316;
+  text-align: left;
+  cursor: pointer;
+}
+
+.reply-preview-card-unread-btn:hover {
+  background: rgba(249, 115, 22, 0.1);
+}
+
+/* ── conversation popup (chat-bubble layout) ─────────────────────────────── */
+
+.conversation-modal {
+  width: 520px;
+  max-width: 100%;
+}
+
+.chat-bubble {
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.chat-bubble p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.chat-bubble-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+/* Their messages lean left, ours lean right — same convention as any chat
+   UI, so which side said what reads at a glance without reading the label. */
+.chat-bubble-them {
+  background: var(--faint);
+  margin-right: 15%;
+}
+
+.chat-bubble-us {
+  background: var(--border);
+  margin-left: 15%;
+}
+
+.chat-bubble-suggestion {
+  border: 1px solid #f97316;
+  background: rgba(249, 115, 22, 0.08);
+}
+
+/* Constrained to the STATUS column's fixed width (see the <colgroup> in
+   CaseTable.tsx) rather than sizing to its longest option text
+   ("CM replied · awaiting user"), which is what forced the column — and the
+   whole table — wider than its container. The rendered value truncates
+   with an ellipsis; the full text is still visible when the dropdown is
+   open, since this only affects the closed, collapsed state. */
+.case-status {
+  font-size: 12px;
+  padding: 5px 8px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.case-status-closed {
+  color: var(--faint);
+}
+
+/* Escalated status ties into the app's one accent color — urgent reads as
+   red the same way a primary button or an error does. */
+.case-status-escalated {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* A second deliberate exception to the grayscale rule (see .chip-bug above):
+   a status dot is meant to be read at a glance down the whole table, which
+   weight/border/position cannot do as fast as color can. Reuses the exact
+   chip-bug/chip-feature hues so the two color systems in this app never
+   disagree about what red or purple means. Lives in its own leading column
+   now, ahead of the # column. */
+.case-status-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Lit-bulb look: a bright off-center highlight so the dot reads as a light
+   source, not a flat fill, plus a soft halo bleeding into the row around it. */
+.case-status-dot-awaiting_reply {
+  background: radial-gradient(circle at 35% 30%, #ffe28a, #ca8a04 65%);
+  box-shadow: 0 0 4px 1px rgba(202, 138, 4, 0.9), 0 0 10px 3px rgba(202, 138, 4, 0.45);
+}
+
+/* "Inactive" — light off, deliberately flat: no glow, unlike the lit
+   statuses above/below. */
+.case-status-dot-inactive {
+  background: radial-gradient(circle at 35% 30%, #d4d4d4, #737373 65%);
+}
+
+.case-status-dot-closed {
+  background: radial-gradient(circle at 35% 30%, #86efac, #15803d 65%);
+  box-shadow: 0 0 4px 1px rgba(21, 128, 61, 0.9), 0 0 10px 3px rgba(21, 128, 61, 0.45);
+}
+
+.case-status-dot-escalated {
+  background: radial-gradient(circle at 35% 30%, #fdba74, #c2410c 65%);
+  box-shadow: 0 0 4px 1px rgba(194, 65, 12, 0.9), 0 0 10px 3px rgba(194, 65, 12, 0.45);
+}
+
+.case-status-dot-cm_replied_waiting {
+  background: radial-gradient(circle at 35% 30%, #d8b4fe, #6d28d9 65%);
+  box-shadow: 0 0 4px 1px rgba(109, 40, 217, 0.9), 0 0 10px 3px rgba(109, 40, 217, 0.45);
+}
+
+.case-status-dot-cm_replied_solved {
+  background: radial-gradient(circle at 35% 30%, #93c5fd, #1d4ed8 65%);
+  box-shadow: 0 0 4px 1px rgba(29, 78, 216, 0.9), 0 0 10px 3px rgba(29, 78, 216, 0.45);
+}
+
+/* The user answered back after we replied — ball's back in our court. Red,
+   the strongest "needs your attention" signal in the table. */
+.case-status-dot-user_replied {
+  background: radial-gradient(circle at 35% 30%, #fca5a5, #b91c1c 65%);
+  box-shadow: 0 0 4px 1px rgba(185, 28, 28, 0.9), 0 0 10px 3px rgba(185, 28, 28, 0.45);
+}
+
+/* ── dashboard ──────────────────────────────────────────────────────────── */
+
+/* The drafted reply is the primary element on the screen — everything below
+   it is supporting evidence — so it carries the stronger border weight
+   already used for inputs, same convention as everywhere else here. */
+.dashboard-draft {
+  border-color: var(--border-strong);
+}
+
+/* Community is ranked #1 — it goes left at 65%, draft at 35% on the right. */
+.dashboard-top {
+  display: grid;
+  grid-template-columns: 65fr 35fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* Tracker and support docs are equal-authority evidence — 50/50. */
+.dashboard-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .dashboard-top,
+  .dashboard-bottom {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── replies (grouped by cluster) ──────────────────────────────────────── */
+
+/* One collapsible box per cluster, individual replies stacked inside.
+   Grayscale only, same rule as everywhere else in this file. */
+.cluster-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.cluster-box-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  border: 0;
+  padding: 12px var(--pad);
+  cursor: pointer;
+  text-align: left;
+}
+
+.cluster-box-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cluster-box-chevron {
+  display: inline-block;
+  font-size: 11px;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.cluster-box-chevron.open {
+  transform: rotate(90deg);
+}
+
+.cluster-box-body {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+}
+
+.reply-item {
+  padding: var(--pad);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  margin-bottom: 10px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.reply-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Verified — the box gets a green ring, same "confirmed good" cue as the
+   Library case dots, so scanning an open cluster shows what's trustworthy
+   at a glance. */
+.reply-item-verified {
+  border-color: #15803d;
+  box-shadow: 0 0 0 1px rgba(21, 128, 61, 0.35);
+}
+
+/* Arrival cue for a reply opened via a deep link (Cases' Reply chip) — a
+   plain ring in the foreground color, not a new accent, that fades after a
+   couple seconds once the operator's eye has found it. */
+.reply-item-highlight {
+  border-color: var(--fg);
+  box-shadow: 0 0 0 2px var(--fg);
+}
+
+.verify-toggle {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 18px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.verify-toggle-on {
+  border-color: #15803d;
+  background: #15803d;
+}
+
+.verify-toggle-knob {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.verify-toggle-on .verify-toggle-knob {
+  background: #ffffff;
+  transform: translateX(14px);
+}
+
+.reply-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.reply-image-thumb {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.reply-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.reply-image-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--fg-hard);
+  background: var(--overlay);
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 3px 5px;
+  cursor: pointer;
+}
+
+.image-drop-zone {
+  margin-top: 8px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Replies is a grid of boxes you click into, not a stack of accordions:
+   the operator thinks of these as folders, so they read as tiles. Every real
+   box is solid-bordered; the only dashed tile is the trailing "add" slot. */
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+/* Four across is the requested layout, but at narrow widths four columns
+   squeeze titles into unreadable slivers, so step down rather than force it. */
+@media (max-width: 1000px) {
+  .box-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .box-grid { grid-template-columns: 1fr; }
+}
+
+.box-tile {
+  position: relative;
+  display: flex;
+  min-height: 132px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+
+.box-tile:hover {
+  border-color: var(--fg);
+  transform: translateY(-1px);
+}
+
+/* The tile is a plain div so the menu button can live inside it without
+   nesting a button in a button; this is the clickable body that opens it. */
+.box-tile-open {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex: 1;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* Trailing "create a box" slot — the one deliberately dashed tile. */
+.box-tile-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 132px;
+  padding: 16px;
+  background: transparent;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.box-tile-add:hover {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+.box-tile-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.box-tile-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.box-tile-menu-btn {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.box-tile-menu-btn:hover {
+  color: var(--fg);
+  background: var(--overlay);
+}
+
+/* Opens upward: dropping it below the ⋯ lands it straight on top of the
+   box's title, hiding the one thing the tile exists to show. */
+.box-tile-menu-pop {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 4px;
+  z-index: 5;
+  min-width: 120px;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 4px;
+}
+
+.box-tile-menu-pop button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  color: var(--fg);
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+.box-tile-menu-pop button:hover {
+  background: var(--overlay);
+}
+
+/* Destructive action, so it reads as one. This is a deliberate exception to
+   the grayscale rule, same basis as the status dots. */
+.box-tile-menu-pop button.danger {
+  color: #f87171;
+}
+
+.box-tile-menu-pop button.danger:hover {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+.btn.danger {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.btn.danger:hover {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+/* Leave room for the ⋯ button so a long title doesn't run under it. */
+.box-tile-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+  padding-right: 22px;
+}
+
+.box-tile-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box-tile,
+  .card.clickable,
+  .cluster-card,
+  .pattern-row,
+  .topic-box {
+    transition: none;
+  }
+
+  .box-tile:hover,
+  .card.clickable:hover,
+  .cluster-card:hover,
+  .pattern-row:hover,
+  .topic-box:hover {
+    transform: none;
+  }
+}
+
+/* Stands in for a field's <label> so a control that has no label still lines
+   up on the same baseline as the labelled selects beside it, instead of
+   floating level with their label text. Matches the label's font metrics. */
+.field-label-spacer {
+  font-size: 12px;
+}
+
+.field-label-spacer::before {
+  content: '\00a0';
+}
+
+.pager {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pager .btn {
+  min-width: 34px;
+  padding-left: 8px;
+  padding-right: 8px;
+}

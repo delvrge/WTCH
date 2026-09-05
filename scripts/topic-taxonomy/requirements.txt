@@ -1,0 +1,17 @@
+WARNING: Ignoring invalid distribution -umap-learn (/Volumes/SSD/Coding/VGLT/.venv/lib/python3.14/site-packages)
+WARNING: Ignoring invalid distribution -numba (/Volumes/SSD/Coding/VGLT/.venv/lib/python3.14/site-packages)
+WARNING: Ignoring invalid distribution -pynndescent (/Volumes/SSD/Coding/VGLT/.venv/lib/python3.14/site-packages)
+WARNING: Ignoring invalid distribution -tqdm (/Volumes/SSD/Coding/VGLT/.venv/lib/python3.14/site-packages)
+WARNING: Ignoring invalid distribution -llvmlite (/Volumes/SSD/Coding/VGLT/.venv/lib/python3.14/site-packages)
+hdbscan==0.8.44
+joblib==1.5.3
+llvmlite==0.49.0
+narwhals==2.24.0
+numba==0.67.0
+numpy==2.5.2
+pynndescent==0.6.0
+scikit-learn==1.9.0
+scipy==1.18.0
+threadpoolctl==3.6.0
+tqdm==4.70.0
+umap-learn==0.5.12

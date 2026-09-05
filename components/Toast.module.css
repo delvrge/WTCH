@@ -1,0 +1,112 @@
+/* Toast notifications — reuses the app's existing CSS custom properties
+   (defined on :root in app/globals.css) rather than duplicating values, but
+   stays a self-contained module so nothing here touches global.css. Falls
+   back to the dark-theme defaults if a var is somehow unavailable. */
+
+.viewport {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(340px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--surface, #151515);
+  color: var(--fg, #ededed);
+  border: 1px solid var(--border-strong, #3f3f3f);
+  border-radius: var(--radius, 6px);
+  padding: 10px 10px 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  animation: toast-in 160ms ease-out;
+}
+
+.toast.leaving {
+  animation: toast-out 160ms ease-in forwards;
+}
+
+/* Restrained color used only for the status dot, never a colored panel —
+   matches the two existing hue exceptions to the grayscale rule (chip-bug's
+   red and the case-status-dot's green in app/globals.css) so this doesn't
+   introduce a third, disagreeing color language. */
+.dot {
+  flex-shrink: 0;
+  margin-top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.success .dot {
+  background: #15803d;
+}
+
+.error .dot {
+  background: #b91c1c;
+}
+
+.message {
+  flex: 1;
+  word-break: break-word;
+}
+
+.dismiss {
+  flex-shrink: 0;
+  font: inherit;
+  background: transparent;
+  border: 0;
+  color: var(--muted, #8f8f8f);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin: -2px -4px -2px 0;
+}
+
+.dismiss:hover {
+  color: var(--fg, #ededed);
+}
+
+.dismiss:focus-visible {
+  outline: 2px solid var(--fg, #ededed);
+  outline-offset: -1px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .toast.leaving {
+    animation: none;
+  }
+}

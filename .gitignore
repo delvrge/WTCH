@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+
+# env
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# next
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# build output
+.next/
+out/
+dist/
+
+# deploy
+.vercel/
+
+# os
+.DS_Store
+._*
+.vercel
+.env*
+
+# topic-taxonomy one-off analysis
+scripts/topic-taxonomy/output/
+scripts/topic-taxonomy/__pycache__/
+.venv/
+
+# private working notes, not for the public repo
+tmp/
+
+# Supabase CLI link cache — machine-local, regenerates via `supabase link`,
+# and carries the real project ref / pooler connection string
+supabase/.temp/

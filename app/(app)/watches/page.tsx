@@ -7,10 +7,10 @@ import { errorMessage, supabaseClient } from '@/lib/supabase'
 import { boardLabelFromSlug } from '@/lib/format'
 import type { RunWatchResponse, Watch } from '@/lib/types'
 
-// Mirrors WATCHED_BOARDS in supabase/functions/_shared/community-sources.ts —
+// Mirrors WATCHED_BOARDS in supabase/functions/_shared/community-sources.ts ,
 // the only boards `categories` can narrow within. Set via
 // NEXT_PUBLIC_WATCHED_BOARDS (comma-separated, client-side mirror of the
-// server-side WATCHED_BOARDS env var — keep the two in sync per deployment).
+// server-side WATCHED_BOARDS env var, keep the two in sync per deployment).
 const BOARDS = (process.env.NEXT_PUBLIC_WATCHED_BOARDS ?? '').split(',').map((s) => s.trim()).filter(Boolean)
 
 interface WatchForm {
@@ -216,7 +216,7 @@ export default function WatchesPage() {
       </div>
 
       <p className="meta">
-        A watch narrows what run-watch discovers on each pass — keywords and, optionally, which watched
+        A watch narrows what run-watch discovers on each pass, keywords and, optionally, which watched
         boards to search. Empty categories means every configured board.
       </p>
 
@@ -327,7 +327,7 @@ export default function WatchesPage() {
                       ))}
                     </div>
                   ) : (
-                    <p className="muted">No keywords — matches on board alone.</p>
+                    <p className="muted">No keywords, matches on board alone.</p>
                   )}
 
                   <p className="meta">

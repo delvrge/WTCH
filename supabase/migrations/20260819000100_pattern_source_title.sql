@@ -7,7 +7,7 @@
 -- came from. issue_summary is a generalized English abstraction, so a
 -- Portuguese thread became an English sentence nobody could match back to the
 -- forum. The title is copied across untouched, in whatever language it was
--- written, and the abstraction stays where it was — issue_summary.
+-- written, and the abstraction stays where it was, issue_summary.
 --
 -- Title only: the post BODY and the replies are still never stored.
 

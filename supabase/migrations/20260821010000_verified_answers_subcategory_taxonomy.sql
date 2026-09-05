@@ -2,12 +2,12 @@
 -- verified_answers.cluster_id) in favor of grouping by the same fixed
 -- 9-topic/27-subtopic taxonomy already locked for community_patterns (see
 -- 20260820010000_fixed_topic_taxonomy.sql). subcategory lives directly on
--- verified_answers, so it covers every reply — including manual entries with
--- no linked case — which cluster_id (reached only via a community_patterns
--- link) could not. `category` is NOT touched here — stays free text.
+-- verified_answers, so it covers every reply, including manual entries with
+-- no linked case, which cluster_id (reached only via a community_patterns
+-- link) could not. `category` is NOT touched here, stays free text.
 --
 -- community_clusters / verified_answers.cluster_id are DELIBERATELY NOT
--- dropped here — Context (app/(app)/context/page.tsx) still reads cluster_id
+-- dropped here, Context (app/(app)/context/page.tsx) still reads cluster_id
 -- for its own unrelated purpose; that cleanup is deferred to its own
 -- migration once Context is resolved.
 --

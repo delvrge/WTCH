@@ -5,7 +5,7 @@
 -- free text, same as category already was.
 --
 -- Grouping on the Replies screen no longer reads TOPIC_TAXONOMY membership
--- to decide nesting — it groups by whatever (category, subcategory) pairs
+-- to decide nesting, it groups by whatever (category, subcategory) pairs
 -- actually exist on the rows (see app/(app)/replies/page.tsx). The 27 fixed
 -- names still ship as suggested options in the picker; they just aren't
 -- enforced any more.

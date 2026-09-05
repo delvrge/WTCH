@@ -16,7 +16,7 @@ interface TopicGroup {
   count: number
 }
 
-// Alphabetical by topic name, except Undefined (the UNCLUSTERED bucket) —
+// Alphabetical by topic name, except Undefined (the UNCLUSTERED bucket) ,
 // a catch-all for whatever didn't classify cleanly, not a real topic, so it
 // always sorts last regardless of where its label would otherwise fall.
 function buildTopicGroups(patterns: PatternRow[]): TopicGroup[] {
@@ -33,7 +33,7 @@ function buildTopicGroups(patterns: PatternRow[]): TopicGroup[] {
   })
 }
 
-// A topic with zero patterns has nothing behind it to show — linking
+// A topic with zero patterns has nothing behind it to show, linking
 // through just lands on the detail page's own empty state one click later,
 // so these render as plain (non-clickable) dashed boxes instead, same
 // visual language .new-tile already uses elsewhere for "nothing here yet".
@@ -61,7 +61,7 @@ function TopicBox({ group }: { group: TopicGroup }) {
 // ── Gaps: which topics keep getting a Go walkthrough built on nothing solid ──
 // One investigation_log row per Go click (see migration 20260822000100).
 // A "gap" is a walkthrough that cited nothing at all, or one the model
-// itself only had low confidence in — either way, this leaf is a shape of
+// itself only had low confidence in, either way, this leaf is a shape of
 // post the tool currently has weak grounding for.
 
 interface LogRow {
@@ -170,7 +170,7 @@ export default function ContextPage() {
         <section className="stack-lg">
           <h2>Gaps</h2>
           <p className="meta">
-            Which topics keep coming back with nothing solid on a Go click — no citable step, or the model
+            Which topics keep coming back with nothing solid on a Go click, no citable step, or the model
             itself flagged low confidence. One row logged per click; fills in as Go gets used.
           </p>
 

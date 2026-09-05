@@ -6,7 +6,7 @@
 -- box the operator made deliberately should not silently disappear into a
 -- merge. This column is the marker that makes respecting that possible.
 --
--- NOTE: refine-clusters does not read this column yet — adding it here is the
+-- NOTE: refine-clusters does not read this column yet, adding it here is the
 -- prerequisite, teaching the edge function to honour it is a follow-up.
 --
 -- Everything that exists today came from the automatic passes, so the default

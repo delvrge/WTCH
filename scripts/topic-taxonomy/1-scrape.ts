@@ -1,7 +1,7 @@
 // Step 1 of the one-off topic-taxonomy pipeline: scrape every watched-board
 // post from the last year into the isolated topic_taxonomy_posts staging
 // table. Read-only toward the platform (GET only), serial, rate-limited, and
-// resumable — safe to re-run or Ctrl-C and restart, upserts on `url` so
+// resumable, safe to re-run or Ctrl-C and restart, upserts on `url` so
 // nothing is re-fetched-and-duplicated, though already-fetched threads are
 // still skipped over on re-run at sitemap-walk speed, not thread-fetch speed.
 //

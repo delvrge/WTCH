@@ -6,7 +6,7 @@ import { callWatchFn } from '@/lib/functions'
 import { supabaseClient } from '@/lib/supabase'
 
 // How often the bell re-checks while the tab is open. Client-driven on
-// purpose — it rides the operator's own login session, the same auth path
+// purpose, it rides the operator's own login session, the same auth path
 // Library/Dashboard already use successfully, rather than the server-side
 // cron+Vault chain that crawl-support-docs has been stuck on.
 const POLL_INTERVAL_MS = 10 * 60 * 1000
@@ -66,7 +66,7 @@ export default function Bell() {
     try {
       await callWatchFn('check-case-replies', {})
     } catch {
-      // Best-effort — a failed check just means the badge doesn't update this
+      // Best-effort, a failed check just means the badge doesn't update this
       // round; it never surfaces as an error to the operator.
     }
     await loadUnread()

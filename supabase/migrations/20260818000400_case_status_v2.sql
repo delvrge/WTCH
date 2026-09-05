@@ -1,6 +1,6 @@
 -- Case status v2: six-value status model, plus a manual URL override column.
 --
--- 'solved' is renamed to 'closed' (same meaning, same green dot) — existing
+-- 'solved' is renamed to 'closed' (same meaning, same green dot), existing
 -- rows are migrated in place. Two new "replied" states are added so a CM's
 -- own reply can be tracked separately from the original awaiting/escalated
 -- states: 'cm_replied_waiting' (replied, waiting on the user) and

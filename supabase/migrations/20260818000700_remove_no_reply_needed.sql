@@ -1,5 +1,5 @@
 -- Drop 'no_reply_needed' from the case status model. It never earned its
--- keep as a separate state — everything that landed there was, in practice,
+-- keep as a separate state, everything that landed there was, in practice,
 -- functionally the same as 'closed' (the case is real, but nothing further
 -- is expected of the CM), so it's folded into that value instead of
 -- carrying a rarely-used sixth status forward.

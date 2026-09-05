@@ -1,14 +1,14 @@
 // Semi-manual reply auto-fill: when a case is marked Closed on the Cases
 // screen, the operator has already resolved it by hand somewhere (their own
 // reply, a screenshot session, whatever). This function does not decide
-// anything was solved — the Closed status already said that. What it does is
+// anything was solved, the Closed status already said that. What it does is
 // draft the reply text FOR the Replies screen so the operator's only step
 // left is review + copy-paste to the platform, instead of typing the whole thing
 // from scratch.
 //
 // Grounding priority, cheapest/most-authoritative first:
 //   1. The case's own thread, if it has a marked Correct Answer or an
-//      authority (staff/CE) reply — the case may have literally been solved
+//      authority (staff/CE) reply, the case may have literally been solved
 //      right there.
 //   2. A solved thread elsewhere in the corpus describing the same problem
 //      (same search findSolvedCases/investigate already use).
@@ -16,7 +16,7 @@
 //      one.
 // If none of the three exist, this returns success:false with a plain
 // "nothing to ground a reply in" error rather than letting the model invent
-// one — same rule investigate's evidence-only prompt already follows.
+// one, same rule investigate's evidence-only prompt already follows.
 //
 // Writes an UNVERIFIED (`verified: false`, `source: 'ai_draft'`) row to
 // verified_answers, linked to the case via verified_answer_cases when the
@@ -37,7 +37,7 @@ import {
 } from '../_shared/community-sources.ts'
 
 interface RequestBody {
-  /** 'pattern:<uuid>' or 'verified:<uuid>' — the Cases row id. */
+  /** 'pattern:<uuid>' or 'verified:<uuid>', the Cases row id. */
   case_id: string
   title: string
   url: string | null
@@ -51,7 +51,7 @@ function trimmedOrNull(value: unknown): string | null {
   return trimmed ? trimmed : null
 }
 
-// Same floor investigate/draft-reply use for match_verified_answers — a
+// Same floor investigate/draft-reply use for match_verified_answers, a
 // standardized reply this close to an existing one is the same underlying
 // problem, so the new case gets linked to it instead of forking a duplicate.
 const VERIFIED_MIN_SIMILARITY = 0.6
@@ -101,7 +101,7 @@ serve(async (req) => {
     const patternId = source === 'pattern' ? rawId : null
 
     // ── Standardize the problem, in English, once ───────────────────────────
-    // Same abstraction community_patterns/verified_answers already store —
+    // Same abstraction community_patterns/verified_answers already store ,
     // not the raw post title (which may be in any language, and is specific
     // to this one poster's wording) so that the next post with the same
     // underlying problem matches this row instead of spawning a duplicate.
@@ -126,7 +126,7 @@ serve(async (req) => {
           .from('verified_answer_cases')
           .insert([{ answer_id: existing.id, pattern_id: patternId, user_id: userId }])
         // A duplicate link (case already linked to this exact reply) is not
-        // an error — same tolerance the manual "Link reply" picker has.
+        // an error, same tolerance the manual "Link reply" picker has.
         if (linkError && linkError.code !== '23505') throw linkError
       }
       return new Response(
@@ -166,7 +166,7 @@ serve(async (req) => {
           }
         }
       } catch {
-        // Non-fatal — falls through to the solved-thread search below.
+        // Non-fatal, falls through to the solved-thread search below.
       }
     }
 
@@ -188,7 +188,7 @@ serve(async (req) => {
           }
         }
       } catch {
-        // Non-fatal — falls through to the pattern fallback below.
+        // Non-fatal, falls through to the pattern fallback below.
       }
     }
 
@@ -212,7 +212,7 @@ Rules:
 - Write in English, always, even when the post or the fix source above is in another language. Translate, don't quote the original wording.
 - Plain, warm, professional support voice. No corporate filler ("We appreciate your patience").
 - State the fix plainly, in the customer's terms, as something they can follow.
-- 2 to 5 sentences. No greeting, no sign-off, no "Best regards" — the operator adds those.
+- 2 to 5 sentences. No greeting, no sign-off, no "Best regards", the operator adds those.
 - Never use an em dash (—); use a period, comma, or "and" instead.
 
 Respond with ONLY the reply text, nothing else.`

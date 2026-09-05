@@ -1,11 +1,11 @@
 -- Saving a reply to verified_answers shouldn't force it into the citation
--- pool — some entries are just a personal record (e.g. answered outside the
+-- pool, some entries are just a personal record (e.g. answered outside the
 -- reply flow, or a note-to-self) and were never meant to ground a future
 -- draft or show up in Tracker search. `tracked` gates both: loadGrounding
 -- (grounding.ts) and match_verified_answers (the Tracker's semantic search,
 -- used by draft-reply) now both require it. Defaults true so every existing
 -- row and every reply saved via ReplyBlock's normal flow keeps behaving
--- exactly as before — this only matters when explicitly turned off.
+-- exactly as before, this only matters when explicitly turned off.
 
 ALTER TABLE public.verified_answers
   ADD COLUMN tracked BOOLEAN NOT NULL DEFAULT true;

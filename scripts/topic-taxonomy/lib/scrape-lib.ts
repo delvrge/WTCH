@@ -3,7 +3,7 @@
 // rather than a shared import: that file lives in the Deno edge-function
 // project (excluded from this repo's tsconfig, own deno.lock) and is scoped
 // to keyword-driven discovery with an edge-function wall-clock budget. This
-// script has neither constraint — it walks every sitemap once, unscored,
+// script has neither constraint, it walks every sitemap once, unscored,
 // bounded only by the 1-year date cutoff and the rate limits below.
 //
 // Same politeness contract as the rest of this tool: GET only, same
@@ -89,12 +89,12 @@ export interface CandidateTopic {
 /**
  * Walks every sitemap-topics-N.xml (newest N first) and returns every
  * watched-board topic URL whose lastmod is within `maxAgeDays` OR has no
- * lastmod at all (kept, not dropped — the per-thread scrape step re-checks
+ * lastmod at all (kept, not dropped, the per-thread scrape step re-checks
  * the real creation date from the page's own JSON-LD, which is authoritative;
  * lastmod only bounds which sitemap files are worth reading).
  *
  * Stops opening further (older) sitemap files once an entire file produces
- * zero in-window candidates — sitemap files are roughly recency-bucketed, so
+ * zero in-window candidates, sitemap files are roughly recency-bucketed, so
  * this is a real stopping signal, not an early truncation of the current
  * file's own entries.
  */
@@ -187,7 +187,7 @@ function extractJsonLdBlocks(html: string): any[] {
 
 /**
  * Fetch a topic page and pull title/body/created_at out of its QAPage or
- * DiscussionForumPosting JSON-LD block — same two schemas as the live
+ * DiscussionForumPosting JSON-LD block, same two schemas as the live
  * scraper (questions-404 uses QAPage, bug-reports/feature-requests use
  * DiscussionForumPosting). Only the original post is kept; replies are out
  * of scope for taxonomy clustering.

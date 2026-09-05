@@ -1,5 +1,5 @@
 -- Every community_patterns row has been reclassified against the fixed
--- taxonomy (scripts/reclassify-patterns.ts, run 2026-08-21 — all 37 live
+-- taxonomy (scripts/reclassify-patterns.ts, run 2026-08-21, all 37 live
 -- rows now carry a valid topic/subtopic, 8 landed "Unclustered"). The
 -- NOT VALID constraints from 20260820010000_fixed_topic_taxonomy.sql can
 -- now be validated for real: this scans existing rows and confirms every

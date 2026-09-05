@@ -1,14 +1,14 @@
 -- Coverage-gap tracking: one best-effort row per Investigate click, so the
 -- operator can eventually see which topics keep coming back with nothing
 -- citable to ground a walkthrough (Section 6 of the status doc: "no
--- coverage-gap view"). Written from investigate/index.ts only — NOT from
+-- coverage-gap view"). Written from investigate/index.ts only, NOT from
 -- buildInvestigation() itself, so scripts/preview-investigation.ts (used for
 -- prompt tuning) stays side-effect-free, and a failed insert here must never
 -- fail the request the operator is waiting on.
 --
 -- topic/subtopic are taken from the top-ranked similar Library case when one
 -- exists (community_patterns.topic/subtopic, already computed at extraction
--- time — no extra classification call spent just to log). Both null means
+-- time, no extra classification call spent just to log). Both null means
 -- no similar case existed at all, which is itself the most useful signal:
 -- a post shape the Library has nothing for yet.
 
@@ -50,4 +50,4 @@ CREATE INDEX investigation_log_topic_subtopic_idx
 -- for solved-thread retrieval. See scripts/topic-taxonomy/README.md for the
 -- full explanation.
 COMMENT ON TABLE public.topic_taxonomy_posts IS
-  'Full-text corpus of scraped community posts. Originally a one-off taxonomy-design staging table, now also live-read by investigation.ts/solved-cases.ts for solved-thread retrieval. Keep topped up — see scripts/topic-taxonomy/README.md.';
+  'Full-text corpus of scraped community posts. Originally a one-off taxonomy-design staging table, now also live-read by investigation.ts/solved-cases.ts for solved-thread retrieval. Keep topped up, see scripts/topic-taxonomy/README.md.';

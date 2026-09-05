@@ -27,7 +27,7 @@ export interface ExtractPatternResult {
 
 // NOTE: `thread.body` and the assembled answers text (the raw source
 // post/reply text) are used ONLY as input to the prompt below and are never
-// written to the database — only the model's abstracted output
+// written to the database, only the model's abstracted output
 // (issue_summary / typical_approach / tags / cluster) is persisted.
 // `thread.title` is the one exception: callers pass it through to
 // `saveExtractedPattern` as `source_title`, stored verbatim so the Cases
@@ -36,35 +36,35 @@ export interface ExtractPatternResult {
 // 20260819000100_pattern_source_title.sql.
 //
 // `groundingBlock`, when present, is prepended verbatim: it declares which
-// sources may be asserted as fact and marks everything after it — including
-// the thread text this function feeds in — as signal only.
+// sources may be asserted as fact and marks everything after it, including
+// the thread text this function feeds in, as signal only.
 function buildSystemPrompt(existingSurfaces: string[], groundingBlock?: string): string {
   const surfaceList = existingSurfaces.length
     ? existingSurfaces.map((s) => `  - ${s}`).join('\n')
-    : '  (none yet — this is the first pattern for this watch)'
+    : '  (none yet, this is the first pattern for this watch)'
 
-  const prompt = `You analyze a support forum thread and extract a GENERALIZED, ABSTRACTED support pattern from it — never verbatim text from the thread.
+  const prompt = `You analyze a support forum thread and extract a GENERALIZED, ABSTRACTED support pattern from it, never verbatim text from the thread.
 
 Rules:
 - Output MUST always be in English, even if the thread is written in another language. Staff replies are always in English; use them as the primary source for the resolution approach.
-- The thread TITLE is the highest-signal field for identifying what the issue actually is — weight it most heavily when writing issue_summary.
+- The thread TITLE is the highest-signal field for identifying what the issue actually is, weight it most heavily when writing issue_summary.
 - issue_summary: ${ISSUE_SUMMARY_CORE}
 - typical_approach: a short, general description of how this type of issue is typically resolved, based on the accepted/suggested answers.
-  SPECIAL CASE — when the surface cannot be determined (see "surface" rule below, "unknown"): "unknown" is not a failure, it is a real triage bucket meaning the thread didn't give enough detail to identify the feature/workflow involved. In this case typical_approach must instead capture the CLARIFYING/DIAGNOSTIC QUESTIONS staff actually asked in the thread to narrow it down — e.g. which feature or workflow, the exact error text, browser/app version, whether it reproduces, job/request timestamps — and, if the replies eventually reveal it, what the issue usually turned out to be. Be specific and pull from what staff actually asked in THIS thread; do not output generic filler like "investigate further" or "ask the user for more information" with no specifics — the actual questions are the deliverable. This special case changes only how typical_approach is written; surface must still be returned as "unknown" per the rule below.
+  SPECIAL CASE, when the surface cannot be determined (see "surface" rule below, "unknown"): "unknown" is not a failure, it is a real triage bucket meaning the thread didn't give enough detail to identify the feature/workflow involved. In this case typical_approach must instead capture the CLARIFYING/DIAGNOSTIC QUESTIONS staff actually asked in the thread to narrow it down, e.g. which feature or workflow, the exact error text, browser/app version, whether it reproduces, job/request timestamps, and, if the replies eventually reveal it, what the issue usually turned out to be. Be specific and pull from what staff actually asked in THIS thread; do not output generic filler like "investigate further" or "ask the user for more information" with no specifics, the actual questions are the deliverable. This special case changes only how typical_approach is written; surface must still be returned as "unknown" per the rule below.
 - tags: 2-6 short lowercase keyword tags categorizing the issue.
 - Never use an em dash (—) anywhere in issue_summary or typical_approach; use a period, comma, or "and" instead.
 - severity: how badly this blocks the user's work: "high" (cannot use the product / paid for something they cannot get / data loss), "medium" (a real problem with a workaround, or degraded but usable), "low" (cosmetic, minor confusion, or a question rather than a failure). Return null only when the thread genuinely gives no basis to judge.
-- surface: a SHORT lowercase noun phrase naming what the user was doing / which feature failed (e.g. "video generation", "image generation", "image to video", "billing/credits", "account/login"). The thread TITLE is OFTEN GENERIC ("Something Went Wrong", "Help", "Bug", "Issue") and tells you nothing about which feature is involved — in those cases you MUST infer the surface from the post body and replies, never from the title alone. If it genuinely cannot be determined from the content, return "unknown".
+- surface: a SHORT lowercase noun phrase naming what the user was doing / which feature failed (e.g. "video generation", "image generation", "image to video", "billing/credits", "account/login"). The thread TITLE is OFTEN GENERIC ("Something Went Wrong", "Help", "Bug", "Issue") and tells you nothing about which feature is involved, in those cases you MUST infer the surface from the post body and replies, never from the title alone. If it genuinely cannot be determined from the content, return "unknown".
 
   EXISTING SURFACE LABELS already used for this watch:
 ${surfaceList}
 
-  Reuse an existing surface label verbatim whenever it fits, even loosely, and only invent a new one when truly none apply. Never reword an existing surface label. "unknown" remains the fallback when the surface genuinely cannot be determined — it is not a case for inventing a new label.
-- topic and subtopic: classify this issue against the FIXED taxonomy below. Pick exactly one topic and exactly one of its subtopics, VERBATIM (exact spelling/case) — never invent, reword, or improve a topic or subtopic name; this list is locked and never grows.
+  Reuse an existing surface label verbatim whenever it fits, even loosely, and only invent a new one when truly none apply. Never reword an existing surface label. "unknown" remains the fallback when the surface genuinely cannot be determined, it is not a case for inventing a new label.
+- topic and subtopic: classify this issue against the FIXED taxonomy below. Pick exactly one topic and exactly one of its subtopics, VERBATIM (exact spelling/case), never invent, reword, or improve a topic or subtopic name; this list is locked and never grows.
 
 ${TAXONOMY_PROMPT_BLOCK}
 
-  If the issue genuinely does not fit any topic above (e.g. pure praise, an off-topic post), return topic "${UNCLUSTERED}" and subtopic "${UNCLUSTERED}" — this is a real, honest outcome, not a failure. Do not force a fit you are not confident about.
+  If the issue genuinely does not fit any topic above (e.g. pure praise, an off-topic post), return topic "${UNCLUSTERED}" and subtopic "${UNCLUSTERED}", this is a real, honest outcome, not a failure. Do not force a fit you are not confident about.
 
 Respond with ONLY a JSON object: { "issue_summary": string, "typical_approach": string, "tags": string[], "surface": string, "severity": "low" | "medium" | "high" | null, "topic": string, "subtopic": string }`
 
@@ -136,7 +136,7 @@ function newestThreadDate(values: string[]): string | null {
 
 /**
  * Runs the model extraction + embedding step against a fetched thread.
- * Does not touch the database — call `saveExtractedPattern` with the
+ * Does not touch the database, call `saveExtractedPattern` with the
  * result to persist it.
  *
  * Pass `opts.grounding` so the verified answers / reference sections are
@@ -154,7 +154,7 @@ export async function extractPatternFromThread(
 
   const answersText = thread.answers
     .map((a, i) => {
-      const authorPart = a.author ? ` (by ${a.author}${a.badge ? ` — ${a.badge}` : ''})` : ''
+      const authorPart = a.author ? ` (by ${a.author}${a.badge ? `, ${a.badge}` : ''})` : ''
       return `Answer ${i + 1}${authorPart}: ${a.text}`
     })
     .join('\n\n')
@@ -184,7 +184,7 @@ export async function extractPatternFromThread(
 
   // Last line of defence against drift: snap the model's surface guess to an
   // existing label if it's a cosmetic variant (case/whitespace/punctuation)
-  // of one already in use — genuinely new wording is left untouched and
+  // of one already in use, genuinely new wording is left untouched and
   // becomes a new surface label. Topic/subtopic, by contrast, are validated
   // against the FIXED taxonomy, not snapped to a growing vocabulary: a value
   // that doesn't match the list exactly (case-insensitively) falls back to
@@ -233,8 +233,8 @@ export async function saveExtractedPattern(
   // pattern and destroy that distinction. So a candidate may only merge
   // into an existing pattern when BOTH the embedding similarity clears the
   // bar AND the two patterns agree on `surface` (case-insensitive). An
-  // 'unknown' surface never matches anything — including another
-  // 'unknown' — so vague, unresolved cases stay separate rather than
+  // 'unknown' surface never matches anything, including another
+  // 'unknown', so vague, unresolved cases stay separate rather than
   // being wrongly merged together.
   const newSurface = (extracted.surface || 'unknown').trim().toLowerCase()
   const newThreadDate = parseThreadDate(extra.thread_created_at)
@@ -312,12 +312,12 @@ export async function saveExtractedPattern(
         source_thread_dates: mergedDates,
         thread_created_at: newestDate,
         // Content changed (bumped/refined), so any prior manual
-        // confirmation no longer applies — the operator must re-verify.
+        // confirmation no longer applies, the operator must re-verify.
         review_status: 'unreviewed',
         reviewed_at: null,
         severity: extracted.severity ?? undefined,
         // The title belongs to the thread that FIRST produced this pattern,
-        // so a later bump from a different thread must not rewrite it — the
+        // so a later bump from a different thread must not rewrite it, the
         // operator would see the case they are tracking silently retitled.
         // Only filled in when there is nothing there yet (rows created
         // before this column existed).

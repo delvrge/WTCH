@@ -8,7 +8,7 @@ import { errorMessage } from '@/lib/supabase'
 // Supabase's recovery link lands here with the session encoded in the URL
 // hash. The app-wide client (lib/supabase.ts) has detectSessionInUrl off,
 // so this page builds its own, short-lived client with it on to pick up
-// that session — never persisted or reused elsewhere.
+// that session, never persisted or reused elsewhere.
 export default function ResetPasswordPage() {
   const router = useRouter()
   const [client, setClient] = useState<SupabaseClient | null>(null)

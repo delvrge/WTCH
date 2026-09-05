@@ -39,7 +39,7 @@ export default function ReplyBlock({
 }: {
   reply: ReplyBlockReply
   watchId?: string | null
-  /** The community_patterns row this reply answers, when known (e.g. the Dashboard's auto-collected self-match) — links the saved Tracker entry to that exact thread. */
+  /** The community_patterns row this reply answers, when known (e.g. the Dashboard's auto-collected self-match), links the saved Tracker entry to that exact thread. */
   patternId?: string | null
   sourceUrl?: string | null
   questionSummary: string
@@ -52,7 +52,7 @@ export default function ReplyBlock({
   const [text, setText] = useState(reply.reply)
 
   // reply.reply only changes when a genuinely new draft lands (a fresh
-  // Dashboard search, a freshly-loaded cluster) — not on every render — so
+  // Dashboard search, a freshly-loaded cluster), not on every render, so
   // resetting here never clobbers an in-progress edit of the current draft.
   useEffect(() => {
     setText(reply.reply)
@@ -63,7 +63,7 @@ export default function ReplyBlock({
   const label = citationLabel(reply.grounding)
 
   // The draft's line breaks are meant as soft returns (Shift+Enter), not new
-  // paragraphs — so plain-text copy is not enough: most rich-text targets
+  // paragraphs, so plain-text copy is not enough: most rich-text targets
   // turn a plain "\n" from pasted text into a brand-new paragraph on its own
   // line, which is exactly the extra reformatting this is trying to avoid.
   // Copying real HTML with <br> for every line break preserves a soft break

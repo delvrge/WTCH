@@ -3,13 +3,13 @@
 -- replied" so that transition doesn't have to stay purely visual.
 --
 -- `last_reply_count` is the baseline the poller (check-case-replies) compares
--- against on each run — the non-staff answer count last time this case was
+-- against on each run, the non-staff answer count last time this case was
 -- checked. A rising count means a new reply arrived since; the column always
 -- gets refreshed after a check, whether or not it found anything new, so the
 -- same reply is never flagged twice.
 --
 -- `unread_since` is the bell's own flag: null means nothing new, a timestamp
--- means "unread since this moment" — cleared (set back to null) when the
+-- means "unread since this moment", cleared (set back to null) when the
 -- operator opens/views the case. Deliberately separate from `status`: an
 -- 'awaiting_reply' case that gets a new comment before anyone from the CM
 -- side has answered doesn't have a more specific status to move into (it's
@@ -19,7 +19,7 @@
 -- 'user_replied' is the one case where a status change IS warranted: a case
 -- sitting in 'cm_replied_waiting' (we replied, waiting on them) that gets a
 -- new non-staff reply means the user answered back and the ball is back in
--- our court — a real, useful distinction from "still waiting on them silently".
+-- our court, a real, useful distinction from "still waiting on them silently".
 -- This is a deliberate, requested exception to the "status is manual only,
 -- never inferred" rule in lib/cases.ts: that rule exists because a reply
 -- after 'closed' can't reliably be told apart from a plain "thanks"; here the

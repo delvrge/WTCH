@@ -16,13 +16,13 @@ import {
 // (_shared/support-docs.ts, called from draft-reply) used to crawl
 // SUPPORT_DOCS_HOST live on the request path, which capped it at 25 pages and
 // a 15s budget just to keep one draft-reply call fast. This function does
-// the same kind of crawl — same HTML→text extraction, same in-tree link
-// rules — but off the request path, walking hundreds of pages with no
+// the same kind of crawl, same HTML→text extraction, same in-tree link
+// rules, but off the request path, walking hundreds of pages with no
 // caller waiting on it, and upserts the result into support_docs.
 // searchSupportDocs() then just reads that table.
 //
 // Run this manually (POST, Bearer service-role key or an authenticated
-// session for ALLOWED_USER_ID — same two-caller auth shape as
+// session for ALLOWED_USER_ID, same two-caller auth shape as
 // refine-clusters) or wire it to a cron job the same way refine-clusters is
 // wired in 20260816000300_cluster_evolution.sql, at whatever cadence the
 // operator wants the corpus refreshed.
@@ -43,25 +43,25 @@ interface CrawlSummary {
 // ceiling turned out lower than that: a real run streaming-upserted 125
 // pages cleanly (see the per-wave upsert above) and then still hit
 // WORKER_RESOURCE_LIMIT mid-crawl. Dropped comfortably under that observed
-// crash point rather than past it — still 4x the old request-path crawl's
+// crash point rather than past it, still 4x the old request-path crawl's
 // MAX_PAGES=25, and every run is idempotent (upsert on url), so raising
 // this again later just needs another empirical check, not a redesign.
 const MAX_PAGES = 100
 // Generous relative to the old 15s request-path budget since nothing is
-// waiting on this call — but still bounded, so a slow/hanging host can't
+// waiting on this call, but still bounded, so a slow/hanging host can't
 // turn this into a runaway invocation.
 const DISCOVER_TIME_BUDGET_MS = 120_000
-// Trimmed from 5 alongside MAX_PAGES — fewer HTML buffers alive at once
+// Trimmed from 5 alongside MAX_PAGES, fewer HTML buffers alive at once
 // lowers peak memory per wave, the same lever as the smaller page cap.
 const CONCURRENCY = 3
 // Politeness delay applied per fetch (i.e. per worker-slot), not once
-// globally — the old sequential loop's DOC_FETCH_DELAY_MS, kept the same
+// globally, the old sequential loop's DOC_FETCH_DELAY_MS, kept the same
 // duration but now overlapping across CONCURRENCY workers instead of
 // serializing the whole crawl behind it.
 const WORKER_DELAY_MS = 300
 
 // Extra known doc entry points beyond the single SEED_URL, for a doc tree
-// deep/wide enough that BFS alone tends to miss pages — hub, get-started,
+// deep/wide enough that BFS alone tends to miss pages, hub, get-started,
 // FAQ, and troubleshooting pages found by walking the vendor's site once.
 // Deployment-specific: set SUPPORT_DOCS_ADDITIONAL_SEEDS (comma-separated
 // absolute URLs) as an env var. Harmless if any of these move or 404: a
@@ -78,7 +78,7 @@ const ADDITIONAL_SEEDS = (Deno.env.get('SUPPORT_DOCS_ADDITIONAL_SEEDS') ?? '')
 // any bounded link walk could discover on its own.
 const SITEMAP_CANDIDATES = [`https://${HOST}/sitemap.xml`]
 // A top-level sitemap index can point at sitemaps for the vendor's entire
-// documentation domain (every product, every locale) — only follow nested
+// documentation domain (every product, every locale), only follow nested
 // sitemaps that look relevant to DOC_PATH_PREFIX by URL, and only up to
 // this many, so one index page can't blow up the crawl into downloading
 // the whole site's sitemap tree before a single doc page is fetched.
@@ -115,7 +115,7 @@ function inScope(rawUrl: string): string | null {
  * Best-effort sitemap walk: tries each sitemap candidate, follows a sitemap
  * index into its doc-tree-relevant nested sitemaps, and returns every
  * in-tree doc URL found. Returns an empty array (never throws) when no
- * sitemap is reachable or none of it is in scope — callers fall back to
+ * sitemap is reachable or none of it is in scope, callers fall back to
  * BFS-from-seeds in that case, exactly as if this function didn't exist.
  */
 async function discoverViaSitemap(): Promise<string[]> {
@@ -176,13 +176,13 @@ interface CrawlResult {
 /**
  * Wave-based worker pool: each wave pulls up to CONCURRENCY URLs off the
  * shared queue and fetches them in parallel, then feeds any newly
- * discovered in-tree links back into the same queue before the next wave —
+ * discovered in-tree links back into the same queue before the next wave ,
  * bounded concurrency with the queue itself as the only shared state, so
  * there's no race between "queue looks empty" and "a sibling fetch is
  * about to add more to it" the way a naive per-worker while-loop would hit.
  *
  * Each wave's pages are upserted immediately (via `onWave`) rather than
- * collected into one array for a single upsert at the end — holding up to
+ * collected into one array for a single upsert at the end, holding up to
  * MAX_PAGES full page texts (each potentially ~1.4MB) in memory for the
  * whole crawl is what was tripping the isolate's WORKER_RESOURCE_LIMIT
  * before a single row ever got written. Peak memory is now bounded to one
@@ -222,7 +222,7 @@ async function crawlPages(
         } catch (err) {
           return { url, ok: false as const, message: err instanceof Error ? err.message : 'fetch failed' }
         } finally {
-          // Per-worker politeness delay — applied whether the fetch
+          // Per-worker politeness delay, applied whether the fetch
           // succeeded or failed, so a run of failures can't turn into a
           // tight retry-free hammering loop against the host.
           await sleep(WORKER_DELAY_MS)

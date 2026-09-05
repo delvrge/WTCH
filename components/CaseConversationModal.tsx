@@ -33,7 +33,7 @@ export default function CaseConversationModal({
     async function load() {
       if (!row.url) {
         setState('error')
-        setError('No link on record for this case — set one from the Cases table first.')
+        setError('No link on record for this case, set one from the Cases table first.')
         return
       }
       try {

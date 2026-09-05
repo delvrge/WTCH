@@ -10,7 +10,7 @@ import type { SaveVerifiedResponse } from '@/lib/types'
 import { plainTextToEditableHtml } from '@/lib/richText'
 
 // The Dashboard's output: how to WORK the case. Deliberately plain and
-// scannable — this gets read while the operator is mid-queue, not studied.
+// scannable, this gets read while the operator is mid-queue, not studied.
 //
 // `case_kind` is the first thing shown because it changes what the rest of
 // the panel means: a closeable case is answered and closed, and carries no
@@ -35,10 +35,10 @@ const KIND_LABEL: Record<InvestigateResponse['investigation']['case_kind'], stri
 // its greeting names them by real name. Reused verbatim for a DIFFERENT
 // customer, that name is simply wrong. Rather than guess-strip whatever
 // greeting is there, replace it outright with a fixed "@user" placeholder the
-// operator can spot and swap for the real name before sending — a standard
+// operator can spot and swap for the real name before sending, a standard
 // shape instead of a name-detection problem. The blank line after it is a
 // deliberate soft break (this app's replies use \n as Shift+Enter, not \n\n
-// as a paragraph mark — see ReplyBlock's copy()), so "Hi @user," / blank /
+// as a paragraph mark, see ReplyBlock's copy()), so "Hi @user," / blank /
 // body renders exactly as typed.
 //
 // The comma/! is the required boundary, not a following newline: the
@@ -58,7 +58,7 @@ function escapeRegExp(text: string): string {
 
 // The platform's scraped reply text often runs straight into the signature with no
 // separator at all (paragraph breaks collapse in the source), so a keyword
-// like "Cheers," is not always there to anchor on — see SIGNOFF_RE. When the
+// like "Cheers," is not always there to anchor on, see SIGNOFF_RE. When the
 // author is known (every solved-thread/trusted-reply card carries one), a
 // trailing occurrence of THEIR actual name is unambiguous and safe to strip
 // even with no keyword in front of it, unlike a generic trailing-word guess.
@@ -99,9 +99,9 @@ function withCombinedGreeting(items: { text: string; author: string | null }[]):
   return `Hi @user,\n\n${bodies.join('\n\n---\n\n')}`
 }
 
-// The scraped answer's screenshots (see SolvedCase.answer.images) — real
+// The scraped answer's screenshots (see SolvedCase.answer.images), real
 // attachments, not the decorative signature graphics already filtered out
-// server-side — appended after the text so a saved reply keeps them instead
+// server-side, appended after the text so a saved reply keeps them instead
 // of silently dropping them the way plain reply_text always did.
 function imagesToHtml(images: string[] | undefined | null): string {
   return (images ?? []).map((url) => `<p><img src="${url}" alt="Attached screenshot"></p>`).join('')
@@ -163,7 +163,7 @@ export default function InvestigationPanel({ data }: { data: InvestigateResponse
   }
 
   // The reply being saved is FOR the case just pasted, not for whichever past
-  // thread the answer was copied from — so it links to THIS case's own
+  // thread the answer was copied from, so it links to THIS case's own
   // auto-collected pattern/url, same as the pre-removal Dashboard draft flow
   // did. Both are null when auto-collect itself failed; save-verified still
   // works with a null pattern/url, it just links nothing.
@@ -208,7 +208,7 @@ export default function InvestigationPanel({ data }: { data: InvestigateResponse
 
       {/* Proof the tool read the real post rather than the one line pasted.
           Absent when free text was pasted, or the fetch failed and it fell
-          back — in which case the errors list below says so. */}
+          back, in which case the errors list below says so. */}
       {data.source ? (
         <p className="meta">
           Read from:{' '}
@@ -284,8 +284,8 @@ export default function InvestigationPanel({ data }: { data: InvestigateResponse
               </div>
               {solved.map((c) => {
                 const key = `s-${c.url}`
-                // Older investigate results — a sessionStorage-restored
-                // Dashboard run, or a stale investigation_log replay — were
+                // Older investigate results, a sessionStorage-restored
+                // Dashboard run, or a stale investigation_log replay, were
                 // saved before `images` existed on this shape at all.
                 const images = c.answer.images ?? []
                 return (

@@ -4,7 +4,7 @@
 -- verified_answers.answer_text. This matters for grounding: only
 -- question_summary is ever sent to the embeddings API (see
 -- save-verified/index.ts and match_verified_answers in
--- 20260818000000_verified_answers_tracked.sql) — answer_text is never
+-- 20260818000000_verified_answers_tracked.sql), answer_text is never
 -- embedded at all today. Keeping images out of answer_text means that stays
 -- true even if a future change starts embedding answer_text too: there is no
 -- image markup anywhere in the text columns to strip.
@@ -47,13 +47,13 @@ CREATE INDEX verified_answer_images_user_id_idx
 -- ── Storage bucket ──────────────────────────────────────────────────────
 -- Private (public = false), matching the per-user_id RLS convention used
 -- everywhere else in this project. Images are only ever served through
--- signed URLs generated at read time by the client — never persisted.
+-- signed URLs generated at read time by the client, never persisted.
 
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('reply-images', 'reply-images', false)
 ON CONFLICT (id) DO NOTHING;
 
--- Upload paths are namespaced {user_id}/{answer_id}/{uuid}.{ext} — the first
+-- Upload paths are namespaced {user_id}/{answer_id}/{uuid}.{ext}, the first
 -- path segment is the owning user, checked via storage.foldername(name).
 
 CREATE POLICY "users_read_own_reply_images"

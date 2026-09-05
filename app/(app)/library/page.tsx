@@ -52,13 +52,13 @@ function buildPageNumbers(current: number, total: number): number[] {
   return out
 }
 
-// The library browses what the system has already collected — community_watches
+// The library browses what the system has already collected, community_watches
 // / watch_id stay in the schema as an internal grouping (community_patterns
 // references them) but nothing on this screen asks the user to name, pick, or
 // configure one. Patterns are read across every watch at once, as one flat,
 // already-sorted collection.
 //
-// This is just Cases now — the Patterns/cluster browser that used to live
+// This is just Cases now, the Patterns/cluster browser that used to live
 // above it described issues without letting the operator act on them, and
 // duplicated data Cases already shows, so it was removed (see the comment
 // further down where it used to render).
@@ -82,11 +82,11 @@ export default function LibraryPage() {
   // clicking a new-reply notification jumps straight to that case instead of
   // a bare case list. useSearchParams (not a raw window.location.search read)
   // so this fires even when the operator is already sitting on /library and
-  // clicks another bell item — a plain effect with an empty dep array would
+  // clicks another bell item, a plain effect with an empty dep array would
   // only ever run on mount and silently do nothing on the second click.
   // Window/status filters are opened wide so an older thread the 30-day
   // default would otherwise hide doesn't make the link look broken. The text
-  // search box is deliberately left alone — the point is to land on the case
+  // search box is deliberately left alone, the point is to land on the case
   // in place, not hide every other row.
   const searchParams = useSearchParams()
   useEffect(() => {
@@ -98,7 +98,7 @@ export default function LibraryPage() {
   }, [searchParams])
 
   // Every verified_answers row, kept around just for the Reply column's
-  // preview snippet (see replyPreviews below) — linking a reply to a case
+  // preview snippet (see replyPreviews below), linking a reply to a case
   // now lives only on /replies ("Linked cases"), not duplicated here.
   const [existingReplies, setExistingReplies] = useState<
     { id: string; question_summary: string; answer_text: string }[]
@@ -107,7 +107,7 @@ export default function LibraryPage() {
   // The chat-bubble popup for a case with an unread new reply.
   const [conversationCase, setConversationCase] = useState<CaseRow | null>(null)
 
-  // `retried` gates the auto-recovery to a single attempt per call — a
+  // `retried` gates the auto-recovery to a single attempt per call, a
   // session refresh either clears the clock-skew rejection or it doesn't;
   // looping on it would just hammer the same failing request.
   const loadCases = useCallback(async (retried = false): Promise<void> => {
@@ -157,14 +157,14 @@ export default function LibraryPage() {
         })),
       )
     } catch (err) {
-      // A fresh session token usually carries a corrected `iat` — worth one
+      // A fresh session token usually carries a corrected `iat`, worth one
       // silent retry before bothering the operator with a Retry button.
       if (!retried && isJwtClockSkewError(err)) {
         try {
           await supabaseClient().auth.refreshSession()
         } catch {
           // Refresh itself failing just means the retry below fails too,
-          // surfacing the same error — nothing extra to handle here.
+          // surfacing the same error, nothing extra to handle here.
         }
         return loadCases(true)
       }
@@ -195,12 +195,12 @@ export default function LibraryPage() {
     }
 
     // Semi-manual reply auto-fill: Solved (closed) and "CM replied · solved"
-    // both mean the operator has already resolved it — the second is a case
+    // both mean the operator has already resolved it, the second is a case
     // still open on the board but answered, so it's just as much a source of
     // a real fix as a fully closed one. If it has no reply on record yet,
     // draft one from whatever solved it (the thread's own answer, a
     // matching solved thread, or the case's recorded fix) so the operator's
-    // only step left is review + copy-paste. Best-effort — a failed draft
+    // only step left is review + copy-paste. Best-effort, a failed draft
     // never blocks the status change itself, it just means write the reply
     // by hand as before.
     if ((status === 'closed' || status === 'cm_replied_solved') && row.replyStatus === 'none') {
@@ -215,14 +215,14 @@ export default function LibraryPage() {
         title: row.title,
         url: row.url,
       })
-      toast.success('Drafted a reply from the fix — review it on Replies.')
+      toast.success('Drafted a reply from the fix, review it on Replies.')
       await loadCases()
     } catch (err) {
-      toast.error(errorMessage(err, 'Could not draft a reply — write this one by hand.'))
+      toast.error(errorMessage(err, 'Could not draft a reply, write this one by hand.'))
     }
   }
 
-  // Clears the bell's unread flag for a case — called when the operator
+  // Clears the bell's unread flag for a case, called when the operator
   // actually looks at it (opens the thread link, or the linked reply). Fire
   // and forget: worst case a stale unread flag lingers one extra poll, never
   // blocks the click it's attached to.
@@ -240,7 +240,7 @@ export default function LibraryPage() {
     })()
   }
 
-  // Manual link override — same upsert path as status/dismissed, keyed by
+  // Manual link override, same upsert path as status/dismissed, keyed by
   // the same case_id. Clearing (url: null) reverts display to the derived
   // link; buildCases treats a null/empty override as "no override".
   async function updateCaseUrl(row: CaseRow, url: string | null) {
@@ -271,7 +271,7 @@ export default function LibraryPage() {
     }
   }
 
-  // Manual title override — same upsert path as status/url, keyed by the
+  // Manual title override, same upsert path as status/url, keyed by the
   // same case_id. Clearing (title: null) reverts display to the derived
   // title; buildCases treats a null/empty override as "no override".
   async function updateCaseTitle(row: CaseRow, title: string | null) {
@@ -300,7 +300,7 @@ export default function LibraryPage() {
   // (community_patterns or verified_answers) plus its case_status row.
   // verified_answer_cases entries cascade automatically (ON DELETE CASCADE).
   // Previously this only upserted case_status.dismissed = true, which left
-  // the row in place forever — "removed" cases kept colliding with anything
+  // the row in place forever, "removed" cases kept colliding with anything
   // that later re-matched the same thread (auto-collect, a backfill run),
   // silently landing back in a hidden, still-dismissed state instead of
   // actually being gone.
@@ -314,7 +314,7 @@ export default function LibraryPage() {
       setCases(prev => [...prev, row])
       return
     }
-    // Best-effort cleanup — case_status has no FK to either source table, so
+    // Best-effort cleanup, case_status has no FK to either source table, so
     // a failure here would only leave a harmless orphaned row behind, never
     // block the actual deletion above.
     await supabaseClient().from('case_status').delete().eq('case_id', row.id)
@@ -334,7 +334,7 @@ export default function LibraryPage() {
     [windowedCases, caseStatusFilter],
   )
   // Same board category shown in the Category column (bug-reports/
-  // feature-requests/questions), derived from the case's own URL — not a
+  // feature-requests/questions), derived from the case's own URL, not a
   // stored field, so filtering just re-derives it per row.
   const categoryFilteredCases = useMemo(
     () =>
@@ -431,7 +431,7 @@ export default function LibraryPage() {
       {/* The pattern/cluster browser used to live here. It described issues
           without letting the operator act on them, and duplicated data that
           Cases and the Replies boxes already show, so it was removed. Its
-          "Sync"/refine control has since been removed too — the fixed
+          "Sync"/refine control has since been removed too, the fixed
           9-topic/27-subtopic taxonomy replaced the self-organizing cluster
           system (community_clusters, refine-clusters, its 30-minute cron)
           entirely, so there is nothing left to sync on demand. */}

@@ -6,8 +6,8 @@ import type { ThreadAnswer } from '../_shared/community-sources.ts'
 import { chatJSON } from '../_shared/ai-provider.ts'
 import { PRODUCT_NAME } from '../_shared/product.ts'
 
-// Takes the title of a post the operator is currently handling — one that has
-// no reply yet — and finds community threads asking the same thing that DO
+// Takes the title of a post the operator is currently handling, one that has
+// no reply yet, and finds community threads asking the same thing that DO
 // already carry an answer from a Community Manager or Community Expert. Those
 // answers are the reusable material; the operator reads them and writes their
 // own reply by hand.
@@ -77,14 +77,14 @@ async function keywordsFromModel(text: string, apiKey: string): Promise<string[]
 You are given the title of a forum post. Return 8-14 lowercase search keywords likely to match OTHER threads asking the same underlying question in DIFFERENT WORDS.
 
 The same problem is described many ways, so cover the range:
-- At least 4 must be SINGLE words — the core nouns and verbs someone would use no matter how they phrase it (e.g. "connector", "credits", "upscale"). These are what catch unexpected phrasings.
+- At least 4 must be SINGLE words, the core nouns and verbs someone would use no matter how they phrase it (e.g. "connector", "credits", "upscale"). These are what catch unexpected phrasings.
 - The rest may be two words, for the specific pairing the post is about.
 - Include synonyms, singular/plural variants, the vendor's own product name and the casual name users type instead, and common misspellings.
 - Correct obvious typos in the input rather than repeating them.
 
 Order the list broadest first, most specific last.
 
-Keywords must be plain search terms only — no punctuation, no quotes, no boolean operators, all lowercase.
+Keywords must be plain search terms only, no punctuation, no quotes, no boolean operators, all lowercase.
 
 Respond with ONLY a JSON object: { "keywords": string[] }`
 
@@ -166,7 +166,7 @@ serve(async (req) => {
     // Two passes, because "nothing found" is the one useless answer here. The
     // first uses the keywords as generated. If that comes back empty, the
     // second widens to the individual words behind them and doubles the age
-    // window — a weaker lead still beats an empty screen.
+    // window, a weaker lead still beats an empty screen.
     let widened = false
     let candidates = await discoverTopics(keywords, [], limit * DISCOVER_MULTIPLIER, maxAgeDays)
 

@@ -2,7 +2,7 @@
 // this project so far came from OpenAI's text-embedding-3-small. Now that
 // all live AI calls go through Gemini (see _shared/ai-provider.ts), those
 // old vectors are meaningless against new Gemini-embedded queries even
-// though the column is still vector(1536) — same dimension count, different
+// though the column is still vector(1536), same dimension count, different
 // model, different vector space. This re-embeds every row in every table
 // that Investigate/search reads from, using the SAME text each row was
 // originally embedded from.
@@ -12,7 +12,7 @@
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... GEMINI_API_KEY=... \
 //     npx tsx scripts/reembed-gemini.ts
 //
-// Safe to re-run — every row gets overwritten each time, so a partial run
+// Safe to re-run, every row gets overwritten each time, so a partial run
 // just means some rows get done twice.
 
 import { createClient } from '@supabase/supabase-js'
@@ -47,7 +47,7 @@ async function embed(text: string): Promise<number[]> {
   return values
 }
 
-/** Small delay between calls — the free tier is rate-limited per minute. */
+/** Small delay between calls, the free tier is rate-limited per minute. */
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }

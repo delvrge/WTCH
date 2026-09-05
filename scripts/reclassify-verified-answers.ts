@@ -7,7 +7,7 @@
 //   - Linked to a community_patterns row (verified_answer_cases) whose own
 //     subtopic is already set: inherit it outright, no LLM call. The
 //     pattern's classification already happened once
-//     (scripts/reclassify-patterns.ts) — one source of truth, no risk of the
+//     (scripts/reclassify-patterns.ts), one source of truth, no risk of the
 //     reply and its case disagreeing.
 //   - Unlinked (or its linked pattern has no subtopic either): classify from
 //     the reply's own text (question_summary + answer_text) against the
@@ -58,13 +58,13 @@ const TAXONOMY_BLOCK = TOPIC_TAXONOMY
   .join('\n')
 
 function buildSystemPrompt(): string {
-  return `You classify existing verified support replies for ${process.env.PRODUCT_NAME ?? 'the product'} against a FIXED, locked list of subtopics. Pick exactly one subtopic, VERBATIM (exact spelling/case) — never invent, reword, or improve a name; this list is locked and never grows.
+  return `You classify existing verified support replies for ${process.env.PRODUCT_NAME ?? 'the product'} against a FIXED, locked list of subtopics. Pick exactly one subtopic, VERBATIM (exact spelling/case), never invent, reword, or improve a name; this list is locked and never grows.
 
 ${TAXONOMY_BLOCK}
 
-If a record genuinely does not fit any subtopic above, return "${UNCLUSTERED}" — a real, honest outcome, not a failure. Do not force a fit you are not confident about.
+If a record genuinely does not fit any subtopic above, return "${UNCLUSTERED}", a real, honest outcome, not a failure. Do not force a fit you are not confident about.
 
-Respond with ONLY a JSON object: { "classifications": [ { "id": "...", "subtopic": "..." } ] } — one entry per input record, in any order, every input id present exactly once.`
+Respond with ONLY a JSON object: { "classifications": [ { "id": "...", "subtopic": "..." } ] }, one entry per input record, in any order, every input id present exactly once.`
 }
 
 async function classifyBatch(rows: Row[]): Promise<{ id: string; subtopic: string }[]> {
@@ -82,7 +82,7 @@ async function classifyBatch(rows: Row[]): Promise<{ id: string; subtopic: strin
   return parsed.classifications
 }
 
-// Same shrinking-filter page loop as reclassify-patterns.ts — moot at
+// Same shrinking-filter page loop as reclassify-patterns.ts, moot at
 // today's 5 rows, kept for consistency with the rest of scripts/.
 const PAGE_SIZE = 1000
 
@@ -145,7 +145,7 @@ async function main() {
       console.log(`  ${row.id}: inherited "${inheritedSubtopic}" from linked pattern`)
     }
 
-    // Path 2: unlinked (or linked pattern has no subtopic either) — classify
+    // Path 2: unlinked (or linked pattern has no subtopic either), classify
     // from the reply's own text.
     if (toClassify.length) {
       try {
@@ -183,7 +183,7 @@ async function main() {
     console.log(`inherited ${inherited}, classified ${classified} so far${failedIds.size ? `, ${failedIds.size} failed` : ''}`)
   }
 
-  console.log(`done — inherited ${inherited}, classified ${classified} via LLM`)
+  console.log(`done, inherited ${inherited}, classified ${classified} via LLM`)
   if (failedIds.size > 0) {
     console.log(`${failedIds.size} row(s) could not be classified: ${[...failedIds].join(', ')}`)
   }

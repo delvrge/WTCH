@@ -2,7 +2,7 @@
 // an answer on them.
 //
 // WHY THIS EXISTS
-// The case the operator is working is almost always unanswered — often empty,
+// The case the operator is working is almost always unanswered, often empty,
 // or carrying nothing but the operator's own "please send a screenshot".
 // Reading that thread tells you what the problem is; it cannot tell you what
 // the solution was. The solution, if it exists anywhere, is on a DIFFERENT
@@ -16,7 +16,7 @@
 // (topic_taxonomy_posts) semantically, then fetches the best candidates and
 // checks each one for a real answer.
 //
-// EMBEDDING SHAPE — the easy mistake here
+// EMBEDDING SHAPE, the easy mistake here
 // topic_taxonomy_posts.embedding is an embedding of `title_en || body_en`,
 // full post text. It is NOT the abstracted one-liner that community_patterns
 // and verified_answers store. Pass this module a FULL-TEXT embedding (the
@@ -48,7 +48,7 @@ const MAX_THREAD_FETCHES = 8
 /** Solved cases worth returning before the live-discovery fallback is skipped.
  *  Bumped from 2 to 3 (with CORPUS_CANDIDATE_LIMIT/MAX_THREAD_FETCHES raised
  *  to match) so a case with real prior art doesn't get shorted just because
- *  two hits looked "enough" — the operator wants three when three exist. */
+ *  two hits looked "enough", the operator wants three when three exist. */
 const ENOUGH_SOLVED = 3
 /** Staff replies per thread sent to the model. Threads rarely carry more than
  *  two or three that are worth judging, and this bounds the prompt. */
@@ -89,7 +89,7 @@ export interface SolvedCase {
     author: string | null
     badge: string | null
     created_at: string | null
-    /** Screenshot/attachment URLs on the real answer — see ThreadAnswer.images. */
+    /** Screenshot/attachment URLs on the real answer, see ThreadAnswer.images. */
     images: string[]
   }
 }
@@ -111,7 +111,7 @@ function sleep(ms: number): Promise<void> {
 // Phrases that mark a reply as a request for information rather than an
 // answer. Free first-pass filter: anything caught here never reaches the
 // model, so the obvious "can you send a screenshot" replies cost nothing to
-// reject. Deliberately conservative — a reply that BOTH asks something and
+// reject. Deliberately conservative, a reply that BOTH asks something and
 // gives a fix must survive this and be judged properly by the model.
 const INFO_REQUEST_PHRASES = [
   'could you provide',
@@ -195,12 +195,12 @@ const CONFIRMATION_PHRASES = [
  * that are PURELY questions out of the paid layer. Rejection needs all three
  * of a question mark, a request phrase, and no actionable marker anywhere in
  * the text. Anything that both asks and answers goes to the model instead,
- * which is the case that matters — staff very often do both at once.
+ * which is the case that matters, staff very often do both at once.
  */
 function looksLikeInfoRequest(text: string): boolean {
   const lower = text.toLowerCase()
   if (!lower.includes('?')) return false
-  // Anything actionable, and this layer abstains — the model decides.
+  // Anything actionable, and this layer abstains, the model decides.
   if (FIX_MARKERS.some((marker) => lower.includes(marker))) return false
   return INFO_REQUEST_PHRASES.some((phrase) => lower.includes(phrase))
 }
@@ -285,7 +285,7 @@ Respond with ONLY a JSON object mapping each number to its verdict, like: { "1":
     })
     return { kept, dropped }
   } catch {
-    // Fail open — see the note above.
+    // Fail open, see the note above.
     return { kept: pending.map((p) => p.candidate), dropped: [] }
   }
 }
@@ -294,7 +294,7 @@ Respond with ONLY a JSON object mapping each number to its verdict, like: { "1":
  * The reply worth considering from a thread, and how strong the claim is.
  *
  * `reason: null` means "a staff reply exists but nothing yet proves it
- * answers anything" — that candidate still has to clear the info-request
+ * answers anything", that candidate still has to clear the info-request
  * heuristic and the model check before it can be shown.
  */
 function bestAnswer(
@@ -409,7 +409,7 @@ async function collectSolved(
 /**
  * Past threads that match the problem AND have an answer on them.
  *
- * `fullTextEmbedding` must be an embedding of full post text — see the
+ * `fullTextEmbedding` must be an embedding of full post text, see the
  * EMBEDDING SHAPE note at the top of this file.
  *
  * Never throws: a failed corpus search or a dead candidate url degrades into

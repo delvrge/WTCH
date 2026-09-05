@@ -2,10 +2,10 @@
 
 // Shared helpers for the reply rich-text editor (components/RichTextEditor.tsx).
 // The approach mirrors Phraseory's macro editor (a plain contenteditable div
-// driven by document.execCommand, not a third-party editor library) — same
+// driven by document.execCommand, not a third-party editor library), same
 // tool, same operator, same "just works in a Chromium browser" bar.
 
-// Only present when the content actually carries formatting — gates whether
+// Only present when the content actually carries formatting, gates whether
 // a saved reply gets an answer_html at all, so a plain reply (the common
 // case, and every pre-existing row) stays a plain string with no HTML to
 // sanitize or render.
@@ -17,7 +17,7 @@ export function hasRichContent(el: HTMLElement): boolean {
 
 // Derives the plain-text fallback (images become "[image]", lists become
 // "- "/"1. " markers) stored as answer_text alongside answer_html. This is
-// what grounding/citation/embedding actually reads — keeping it plain text
+// what grounding/citation/embedding actually reads, keeping it plain text
 // means rich formatting never risks a citation excerpt failing to literally
 // match its source.
 export function plainTextFromEditable(el: HTMLElement): string {
@@ -59,7 +59,7 @@ export function plainTextFromEditable(el: HTMLElement): string {
   return out.replace(/\n{3,}/g, '\n\n').replace(/^\n+|\n+$/g, '')
 }
 
-// Allowlist for pasted HTML — everything else is unwrapped (its children are
+// Allowlist for pasted HTML, everything else is unwrapped (its children are
 // kept, the tag itself dropped) rather than stripped outright, so pasting a
 // Google Doc or a forum post keeps its text and basic structure without
 // carrying over arbitrary styling, scripts, or tracking markup.
@@ -101,7 +101,7 @@ export function sanitizePastedHtml(html: string): string {
 }
 
 // Downscales a picked/pasted image before it goes inline as a base64 data
-// URI — this is the reply's permanent copy (the source Storage-backed
+// URI, this is the reply's permanent copy (the source Storage-backed
 // system's signed URLs expire; a self-contained data URI never does), so
 // keeping it small matters more than keeping it lossless. PNG/GIF sources
 // keep their format (likely a screenshot or logo needing transparency);
@@ -142,7 +142,7 @@ export function fileToInlineImage(file: File): Promise<string> {
 }
 
 // Legacy answer_text rows have no answer_html and were plain strings with
-// real newlines — contenteditable collapses a raw "\n" visually, so opening
+// real newlines, contenteditable collapses a raw "\n" visually, so opening
 // one for editing needs it converted to the same per-line <div> shape typing
 // Enter in the editor would itself produce.
 export function plainTextToEditableHtml(text: string): string {

@@ -8,7 +8,7 @@
 // (community_patterns), not the isolated topic_taxonomy_posts staging
 // table. Safe to re-run: only rows with subtopic IS NULL are touched, and a
 // row that fails classification is simply left NULL (the topic/subtopic
-// CHECK constraints already tolerate NULL — see
+// CHECK constraints already tolerate NULL, see
 // 20260820010000_fixed_topic_taxonomy.sql) rather than forced to a guess.
 //
 // Run:
@@ -48,13 +48,13 @@ interface Classification {
 }
 
 function buildSystemPrompt(): string {
-  return `You classify existing support-pattern records for ${process.env.PRODUCT_NAME ?? 'the product'} against a FIXED, locked taxonomy. Pick exactly one topic and exactly one of its subtopics per record, VERBATIM (exact spelling/case) — never invent, reword, or improve a name; this list is locked and never grows.
+  return `You classify existing support-pattern records for ${process.env.PRODUCT_NAME ?? 'the product'} against a FIXED, locked taxonomy. Pick exactly one topic and exactly one of its subtopics per record, VERBATIM (exact spelling/case), never invent, reword, or improve a name; this list is locked and never grows.
 
 ${TAXONOMY_PROMPT_BLOCK}
 
-If a record genuinely does not fit any topic above, return topic "${UNCLUSTERED}" and subtopic "${UNCLUSTERED}" — a real, honest outcome, not a failure. Do not force a fit you are not confident about.
+If a record genuinely does not fit any topic above, return topic "${UNCLUSTERED}" and subtopic "${UNCLUSTERED}", a real, honest outcome, not a failure. Do not force a fit you are not confident about.
 
-Respond with ONLY a JSON object: { "classifications": [ { "id": "...", "topic": "...", "subtopic": "..." } ] } — one entry per input record, in any order, every input id present exactly once.`
+Respond with ONLY a JSON object: { "classifications": [ { "id": "...", "topic": "...", "subtopic": "..." } ] }, one entry per input record, in any order, every input id present exactly once.`
 }
 
 async function classifyBatch(rows: Row[]): Promise<Classification[]> {
@@ -81,7 +81,7 @@ async function classifyBatch(rows: Row[]): Promise<Classification[]> {
 // PostgREST caps a single response at 1000 rows by default. Each processed
 // row flips subtopic from NULL to non-NULL, so the `IS NULL` filter's result
 // set shrinks out from under an offset-based page (same issue as
-// 1b-translate.ts/2-embed.ts) — re-query "next 1000 still-NULL rows" each
+// 1b-translate.ts/2-embed.ts), re-query "next 1000 still-NULL rows" each
 // round instead.
 const PAGE_SIZE = 1000
 

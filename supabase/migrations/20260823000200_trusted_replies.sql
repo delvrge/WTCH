@@ -2,7 +2,7 @@
 -- Experts (see TRUSTED_AUTHORS in _shared/community-sources.ts) other than
 -- the operator. Distinct from verified_answers on purpose: that table's
 -- whole design is "a reply the operator actually sent and confirmed
--- worked" (see its header comment in 20260815000200_grounding.sql) — these
+-- worked" (see its header comment in 20260815000200_grounding.sql), these
 -- rows are someone else's reply, never the operator's own, so folding them
 -- in would misrepresent both what verified_answers means and what the
 -- Investigate prompt tells the model it is reading.

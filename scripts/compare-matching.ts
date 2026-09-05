@@ -7,7 +7,7 @@
 //
 // METHOD
 // Every community_patterns row stores `source_title`: the real post title,
-// in the poster's own language, verbatim. That gives free ground truth —
+// in the poster's own language, verbatim. That gives free ground truth ,
 // query with a case's own title and the case itself is the row that SHOULD
 // come back first. So for each sampled row we:
 //
@@ -20,7 +20,7 @@
 // rank "-" means the true row did not come back at all above the floor.
 //
 // The same two embeddings are also run against verified_answers, whose
-// stored vectors are embeddings of `question_summary` — abstracted English.
+// stored vectors are embeddings of `question_summary`, abstracted English.
 // There is no ground truth there, so it reports top-1 similarity only: the
 // number that TRACKER_MIN_SIMILARITY has to be set against.
 
@@ -91,7 +91,7 @@ function pad(s: string, n: number): string {
 }
 
 function fmtRank(rank: number | null, sim: number | undefined): string {
-  if (rank === null) return pad('—', 11)
+  if (rank === null) return pad('n/a', 11)
   return pad(`#${rank} @ ${sim!.toFixed(3)}`, 11)
 }
 
@@ -112,7 +112,7 @@ async function main() {
   if (error) throw error
   const rows = (data ?? []) as Row[]
   if (!rows.length) {
-    console.log('No community_patterns rows with a source_title — nothing to probe.')
+    console.log('No community_patterns rows with a source_title, nothing to probe.')
     return
   }
 
@@ -156,7 +156,7 @@ async function main() {
       if (VERBOSE) {
         console.log(`    stored issue_summary: ${row.issue_summary}`)
         console.log(`    normalized query:     ${issueDescription}`)
-        console.log(`    tracker top-1:        old ${oldTracker[0]?.similarity.toFixed(3) ?? '—'} / new ${newTracker[0]?.similarity.toFixed(3) ?? '—'}`)
+        console.log(`    tracker top-1:        old ${oldTracker[0]?.similarity.toFixed(3) ?? 'n/a'} / new ${newTracker[0]?.similarity.toFixed(3) ?? 'n/a'}`)
       }
     } catch (err) {
       console.log(`${pad(title, 44)} ERROR: ${err instanceof Error ? err.message : String(err)}`)

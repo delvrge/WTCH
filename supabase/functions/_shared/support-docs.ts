@@ -1,7 +1,7 @@
 // Source helpers for the product's official support/documentation site.
 // All public pages, no auth needed.
 //
-// Host, doc-tree prefix and crawl seed are deployment config, not hardcoded —
+// Host, doc-tree prefix and crawl seed are deployment config, not hardcoded ,
 // set SUPPORT_DOCS_HOST, SUPPORT_DOCS_PATH_PREFIX and SUPPORT_DOCS_SEED_URL
 // as environment variables per deployment.
 //
@@ -9,7 +9,7 @@
 // QAPage/DiscussionForumPosting blocks), doc pages carry no structured data
 // for their body content, so this module reads plain HTML and reduces it to
 // text itself. searchSupportDocs() is intentionally the only export most
-// callers need — if the vendor ever exposes an official docs API, only the
+// callers need, if the vendor ever exposes an official docs API, only the
 // discovery internals below need to change.
 //
 // Read-only toward the outside world: HTTP GET to SUPPORT_DOCS_HOST, nothing
@@ -20,7 +20,7 @@
 // request path by the crawl-support-docs edge function, on its own cron/
 // manual schedule) instead of crawling live. The bounded BFS crawl below
 // (discoverDocPages() and friends) is kept as-is and used only as a
-// fallback for the rare case the table hasn't been crawled yet — see
+// fallback for the rare case the table hasn't been crawled yet, see
 // getCorpus(). Several of its pieces (fetchText, htmlToText, extractTitle,
 // extractDocLinks, and the HOST/DOC_PATH_PREFIX/SEED_URL constants) are
 // exported so crawl-support-docs can reuse the exact same HTML→text
@@ -51,7 +51,7 @@ const DB_CANDIDATE_LIMIT = 60
 const DOC_FETCH_DELAY_MS = 300
 
 // Bounded discovery: a hard page cap and a wall-clock budget, the same shape
-// as community-sources.ts's MAX_TOPIC_SITEMAPS / DISCOVER_TIME_BUDGET_MS —
+// as community-sources.ts's MAX_TOPIC_SITEMAPS / DISCOVER_TIME_BUDGET_MS ,
 // stop scanning and return whatever was collected rather than risk pushing an
 // invocation into a 546 WORKER_LIMIT, and never walk the whole domain.
 const MAX_PAGES = 25
@@ -60,14 +60,14 @@ const DISCOVER_TIME_BUDGET_MS = 15000
 // The discovery result is cached in module scope so a warm isolate reuses it
 // across requests instead of re-walking SUPPORT_DOCS_HOST on every draft. This
 // is extra politeness on top of the bounded discovery above, not a
-// substitute for it — a cold isolate still fetches fresh, still bounded the
+// substitute for it, a cold isolate still fetches fresh, still bounded the
 // same way.
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000 // 6 hours
 
 const DEFAULT_SEARCH_LIMIT = 5
 const EXCERPT_CHARS = 700
 // Skip trivially short lines (nav crumbs, single-word labels, button text)
-// when picking passages — they are never a useful citation source.
+// when picking passages, they are never a useful citation source.
 const MIN_PASSAGE_CHARS = 40
 
 export interface SupportDocPage {
@@ -85,7 +85,7 @@ export interface SupportDocMatch {
   /**
    * The full plain text of the source page. Citation verification checks a
    * model's quoted excerpt against THIS, not against the (possibly
-   * truncated) `excerpt` above — a quote just has to be verbatim somewhere
+   * truncated) `excerpt` above, a quote just has to be verbatim somewhere
    * in the page, not inside the specific passage we chose to display.
    */
   pageText: string
@@ -122,11 +122,11 @@ function decodeEntities(value: string): string {
     .replace(/&([a-zA-Z]+);/g, (m, name) => NAMED_ENTITIES[name] ?? m)
 }
 
-// Chrome regions that are never real documentation content — dropped whole,
+// Chrome regions that are never real documentation content, dropped whole,
 // tag and contents, before anything else runs.
 const CHROME_BLOCK_RE = /<(script|style|nav|header|footer|aside|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi
 // Block-level tags become line breaks so paragraph structure survives tag
-// stripping — searchSupportDocs() splits passages on these breaks.
+// stripping, searchSupportDocs() splits passages on these breaks.
 const BLOCK_TAG_RE = /<\/?(p|div|li|ul|ol|br|h[1-6]|section|article|tr|table|blockquote)\b[^>]*>/gi
 
 /** Reduces a doc page's raw HTML to plain text, one passage per line. */
@@ -153,7 +153,7 @@ export function extractTitle(html: string, url: string): string {
   return trimmed || raw
 }
 
-/** In-domain, in-tree `.html` links found in a page — the only ones followed onward. */
+/** In-domain, in-tree `.html` links found in a page, the only ones followed onward. */
 export function extractDocLinks(html: string, baseUrl: string): string[] {
   const hrefs = Array.from(html.matchAll(/<a\b[^>]*\shref=["']([^"'#]+)["']/gi), (m) => m[1])
   const seen = new Set<string>()
@@ -248,7 +248,7 @@ async function getCorpus(): Promise<SupportDocPage[]> {
 //
 // crawl-support-docs (a separate edge function, off the request path) owns
 // writing to support_docs. This module only ever reads it, via the
-// service-role client the caller already has (see searchSupportDocs below) —
+// service-role client the caller already has (see searchSupportDocs below) ,
 // no Deno.env access of its own, so this module stays safe to pull into
 // tsc's type-check graph from the Next.js side (see the note on
 // allowImportingTsExtensions in tsconfig.json).
@@ -256,8 +256,8 @@ async function getCorpus(): Promise<SupportDocPage[]> {
 /**
  * Candidate pages for a keyword search, sourced from the support_docs
  * table. Returns `null` as a sentinel meaning "table has never been
- * crawled" — distinct from "crawled, but nothing matched these keywords"
- * (a plain empty array) — so the caller knows to fall back to a live crawl
+ * crawled", distinct from "crawled, but nothing matched these keywords"
+ * (a plain empty array), so the caller knows to fall back to a live crawl
  * only in the former case, never on an ordinary no-match search.
  */
 async function queryCandidateRows(
@@ -291,7 +291,7 @@ async function queryCandidateRows(
 
 /**
  * Scores every page in `corpus` against `lowerKeywords` and returns the top
- * `limit` matches — one passage per distinct page URL, best-scoring pages
+ * `limit` matches, one passage per distinct page URL, best-scoring pages
  * first. Shared by both the DB-backed path and the crawl fallback below so
  * excerpt selection behaves identically regardless of corpus source.
  */
@@ -337,7 +337,7 @@ function rankAndSlice(
 
 /**
  * Given search keywords, returns the most relevant documentation passages
- * across the support-doc corpus — one passage per distinct page URL,
+ * across the support-doc corpus, one passage per distinct page URL,
  * best-scoring pages first. Callers get `pageText` alongside each `excerpt`
  * so a later citation check can verify a quote against the whole page.
  *
@@ -370,7 +370,7 @@ export async function searchSupportDocs(
     corpus = await getCorpus()
   } catch (err) {
     // A failed fetch degrades to "no support docs" rather than failing the
-    // whole draft — the other two sources still stand on their own.
+    // whole draft, the other two sources still stand on their own.
     console.warn('[support-docs] corpus fetch failed:', err)
     return []
   }

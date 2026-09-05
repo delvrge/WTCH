@@ -4,19 +4,19 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { fileToInlineImage, hasRichContent, plainTextFromEditable, sanitizePastedHtml } from '@/lib/richText'
 
 export interface RichTextEditorHandle {
-  /** Reads the live DOM at call time — text is always safe to store as-is
+  /** Reads the live DOM at call time, text is always safe to store as-is
    * (grounding/citation/embedding read it); html is only set when the
    * content actually carries formatting, so a plain reply stays plain. */
   getContent: () => { text: string; html: string | null }
   focus: () => void
 }
 
-// Uncontrolled by design — a contenteditable fought over by React on every
+// Uncontrolled by design, a contenteditable fought over by React on every
 // keystroke loses the caret position. initialHtml seeds the DOM once on
 // mount; from then on this component owns its own content until the parent
 // reads it back via the ref (on submit). Remount with a fresh `key` to reset
 // it for a different row (Add vs. Edit, or switching which reply is being
-// edited) — the idiomatic way to reset an uncontrolled field in React.
+// edited), the idiomatic way to reset an uncontrolled field in React.
 const RichTextEditor = forwardRef<RichTextEditorHandle, { initialHtml: string; placeholder?: string }>(
   function RichTextEditor({ initialHtml, placeholder }, ref) {
     const contentRef = useRef<HTMLDivElement>(null)
@@ -25,7 +25,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, { initialHtml: string; p
 
     useEffect(() => {
       if (contentRef.current) contentRef.current.innerHTML = initialHtml
-      // Seeded once per mount (see the key-remount note above) — re-running
+      // Seeded once per mount (see the key-remount note above), re-running
       // this on every initialHtml identity change would stomp on whatever
       // the operator has typed since.
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,7 +115,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, { initialHtml: string; p
         const dataUrl = await fileToInlineImage(file)
         insertImageAtCursor(dataUrl)
       } catch {
-        // A bad/corrupt image just doesn't insert — nothing else in the
+        // A bad/corrupt image just doesn't insert, nothing else in the
         // reply is at risk, so this fails silently rather than blocking.
       }
     }
@@ -127,7 +127,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, { initialHtml: string; p
       if (imageItem) {
         const file = imageItem.getAsFile()
         // The paste cursor is still live at this exact point, but decoding
-        // the image is async — capture it now (synchronously, same as the
+        // the image is async, capture it now (synchronously, same as the
         // image-picker button does before its dialog steals focus) so
         // insertImageAtCursor restores this exact spot instead of falling
         // back to appending at the end once the decode resolves.

@@ -2,15 +2,15 @@
 -- to support an autonomous drafting path (stage-ai-drafts) alongside the
 -- existing manual save flow (save-verified / ReplyBlock "Save to Replies").
 --
--- Today every row in verified_answers was put there by a human action —
+-- Today every row in verified_answers was put there by a human action ,
 -- clicking "Save to Replies" on an AI draft, or filling in the manual-entry
--- form — so `tracked` (default true) already meant "trust this, use it to
+-- form, so `tracked` (default true) already meant "trust this, use it to
 -- ground and cite future drafts." That is exactly what "verified" means
 -- going forward, so this is a rename, not a new concept: existing rows keep
 -- behaving exactly as before.
 --
 -- What's new is stage-ai-drafts, which writes a drafted reply into this
--- table on its own, with no click — for a case that's open in the Library
+-- table on its own, with no click, for a case that's open in the Library
 -- and doesn't have a reply yet. Those rows insert with verified = false, so
 -- they sit in Replies for review without silently grounding anything until
 -- the operator flips the toggle. `source` records which path wrote the row,
@@ -22,7 +22,7 @@ ALTER TABLE public.verified_answers
 
 CREATE INDEX IF NOT EXISTS verified_answers_source_idx ON public.verified_answers (source);
 
--- Same signature/return shape as the v2 function in 20260818000000 — the
+-- Same signature/return shape as the v2 function in 20260818000000, the
 -- WHERE clause is the only change, so CREATE OR REPLACE is safe here (no
 -- DROP needed, unlike the source_url-adding change in that same migration).
 CREATE OR REPLACE FUNCTION public.match_verified_answers(

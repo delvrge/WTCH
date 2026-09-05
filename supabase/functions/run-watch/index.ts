@@ -90,7 +90,7 @@ serve(async (req) => {
     const existingSurfaces = [...new Set((vocabRows ?? []).map((r) => r.surface).filter((s): s is string => !!s && s.toLowerCase() !== 'unknown'))]
 
     // ── Grounding: verified answers + reference docs outrank forum text.
-    // Loaded once per run rather than per topic — it is the same bundle for
+    // Loaded once per run rather than per topic, it is the same bundle for
     // every thread and each load is two DB reads.
     const grounding = await loadGrounding(supabaseAdmin, userId, { watchId: watch_id })
 

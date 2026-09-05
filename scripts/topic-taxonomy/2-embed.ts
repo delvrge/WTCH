@@ -48,7 +48,7 @@ async function embedBatch(texts: string[]): Promise<number[][]> {
 /**
  * Embeds a batch as one request when possible. If the batch request fails
  * for any reason, falls back to embedding each item individually so one bad
- * post can't take down the other 49 with it — the culprit is logged by id
+ * post can't take down the other 49 with it, the culprit is logged by id
  * and reported as `null` (caller leaves its embedding NULL rather than
  * guessing), everything else still gets embedded.
  */
@@ -78,7 +78,7 @@ async function embedBatchSafely(
 // paginate with .range() (which would misbehave here: each processed row
 // flips embedding from NULL to non-NULL, so the `IS NULL` filter's result
 // set shrinks out from under an offset-based page), just re-query "next
-// 1000 still-NULL rows" each round — already-embedded rows fall out of the
+// 1000 still-NULL rows" each round, already-embedded rows fall out of the
 // filter on their own, so this naturally converges without ever skipping or
 // re-processing a row.
 const PAGE_SIZE = 1000
@@ -87,7 +87,7 @@ async function main() {
   let totalEmbedded = 0
   // Ids that failed even the individual-retry fallback. Their embedding
   // stays NULL, so without this they'd reappear in every future page
-  // forever — tracked here so a round containing only known failures stops
+  // forever, tracked here so a round containing only known failures stops
   // the loop instead of spinning on it.
   const failedIds = new Set<string>()
 

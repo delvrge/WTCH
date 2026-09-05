@@ -1,4 +1,4 @@
-// Investigation walkthrough screen — types only.
+// Investigation walkthrough screen, types only.
 //
 // Mirrors the `investigate` edge function's response contract
 // (supabase/functions/investigate/index.ts). Kept out of lib/dashboard.ts on
@@ -33,7 +33,7 @@ export interface Investigation {
   one_liner: string
   confidence: 'high' | 'medium' | 'low'
   steps: InvestigationStep[]
-  /** Always empty for `closeable` cases — enforced by the edge function. */
+  /** Always empty for `closeable` cases, enforced by the edge function. */
   questions_to_ask: InvestigationQuestion[]
   watch_out: string[]
 }
@@ -94,7 +94,7 @@ export interface SolvedCase {
 
 export interface InvestigateRequest {
   text: string
-  /** Set by a Library "Rerun" — the case is already in community_patterns,
+  /** Set by a Library "Rerun", the case is already in community_patterns,
    *  so auto-collect must not touch it again. Requires pattern_id to still
    *  get a usable auto_collected (and therefore Tags) back. */
   skip_auto_collect?: boolean
@@ -119,7 +119,7 @@ export interface InvestigateResponse {
   source: { url: string; title: string } | null
   /** The pasted case, auto-collected into the Library on every call. `url` is
    *  null when no thread was fetched and the case was collected from the
-   *  pasted text itself — flagged for the operator to paste the real link in
+   *  pasted text itself, flagged for the operator to paste the real link in
    *  by hand later, never dropped. Null only when the collect itself failed
    *  (see `errors`). */
   auto_collected: { url: string | null; pattern_id: string; action: 'inserted' | 'updated' | 'skipped' } | null
@@ -147,7 +147,7 @@ export function resolveCite(
   }
   const id = cite.slice(3, -1)
   if (cite.startsWith('[S:')) {
-    // Solved threads are keyed by url, not an id — they are community
+    // Solved threads are keyed by url, not an id, they are community
     // threads, not rows we own.
     const hit = solved.find((c) => c.url === id)
     return hit ? { label: hit.title, url: hit.url } : null

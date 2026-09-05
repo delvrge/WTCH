@@ -1,6 +1,6 @@
 import { chatJSON, embed } from './ai-provider.ts'
 
-// Query-side issue normalization — the counterpart to the ingest-side
+// Query-side issue normalization, the counterpart to the ingest-side
 // abstraction done in pattern-extract.ts.
 //
 // WHY THIS EXISTS
@@ -15,7 +15,7 @@ import { chatJSON, embed } from './ai-provider.ts'
 // post title/body, often in another language, full of one user's specific
 // wording. Embedding that raw text and comparing it against abstracted
 // English summaries compares two different KINDS of text, so cosine
-// similarity reads low even when the underlying problem is identical — which
+// similarity reads low even when the underlying problem is identical, which
 // is exactly the "two posts about the same bug, worded differently, don't
 // match" failure this module fixes.
 //
@@ -34,19 +34,19 @@ import { chatJSON, embed } from './ai-provider.ts'
  * (`issue_description` below).
  *
  * Substituted back into pattern-extract's prompt it reproduces that prompt's
- * original `issue_summary` bullet byte for byte — deliberately, so the 38
+ * original `issue_summary` bullet byte for byte, deliberately, so the 38
  * existing community_patterns embeddings stay comparable to newly written
  * ones. Do not reword this without re-embedding the stored rows.
  */
 export const ISSUE_SUMMARY_CORE =
-  `a short, general description of the TYPE of issue (not this specific user's specifics — no names, no verbatim quotes, no order/case numbers). Generalize so it would match other users hitting the same underlying problem.`
+  `a short, general description of the TYPE of issue (not this specific user's specifics, no names, no verbatim quotes, no order/case numbers). Generalize so it would match other users hitting the same underlying problem.`
 
 const NORMALIZE_SYSTEM_PROMPT =
-  `You read an incoming support post (in any language) and write a short, GENERALIZED, ABSTRACTED issue description of the type of problem it describes — never verbatim text from the post.
+  `You read an incoming support post (in any language) and write a short, GENERALIZED, ABSTRACTED issue description of the type of problem it describes, never verbatim text from the post.
 
 Rules:
 - Output MUST always be in English, even if the post is written in another language.
-- The post TITLE is the highest-signal field for identifying what the issue actually is — weight it most heavily. Generic titles ("Something Went Wrong", "Help", "Bug", "Issue") say nothing about the actual problem: when the title is one of those, infer the issue from the body instead.
+- The post TITLE is the highest-signal field for identifying what the issue actually is, weight it most heavily. Generic titles ("Something Went Wrong", "Help", "Bug", "Issue") say nothing about the actual problem: when the title is one of those, infer the issue from the body instead.
 - issue_description: ${ISSUE_SUMMARY_CORE}
 - Write one or two plain sentences. No lists, no preamble, no restating the question back.
 - Never use an em dash (—); use a period, comma, or "and" instead.
@@ -85,7 +85,7 @@ export async function normalizeIssue(text: string, apiKey: string): Promise<stri
 
 /** Embeds already-normalized text with the model/dimensions every stored
  *  embedding in this project uses. Nothing else may embed with different
- *  settings — the vectors would not be comparable. */
+ *  settings, the vectors would not be comparable. */
 export async function embedText(text: string, apiKey: string): Promise<number[]> {
   return embed({ apiKey, text })
 }
@@ -93,7 +93,7 @@ export async function embedText(text: string, apiKey: string): Promise<number[]>
 /**
  * The whole query-side entry point: raw pasted text in, one abstracted
  * description plus its embedding out. Call this ONCE per request and reuse
- * the embedding across every search — every stored embedding in this project
+ * the embedding across every search, every stored embedding in this project
  * lives in the same vector space, so one embed call serves
  * match_community_patterns and match_verified_answers both.
  */

@@ -1,5 +1,5 @@
 -- Every verified_answers row has been reclassified against the fixed
--- taxonomy (scripts/reclassify-verified-answers.ts, run 2026-08-21 — all 5
+-- taxonomy (scripts/reclassify-verified-answers.ts, run 2026-08-21, all 5
 -- rows now carry a valid subcategory: 3 inherited outright from their linked
 -- pattern's subtopic, 2 classified from their own text via LLM, 1 of those
 -- landed "Unclustered", 0 failed). The NOT VALID constraint from

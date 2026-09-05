@@ -21,14 +21,14 @@ interface PatternRow {
 }
 
 // `groundingBlock`, when present, is prepended verbatim so the model reads
-// the authoritative sources first and treats everything after them — the
-// pattern sample below included — as signal only.
+// the authoritative sources first and treats everything after them, the
+// pattern sample below included, as signal only.
 function buildSystemPrompt(hasPatterns: boolean, groundingBlock?: string): string {
   const base = `You generate search keywords used to find community forum threads about a specific topic in the ${PRODUCT_NAME} community. Keywords are matched against thread titles and URL slugs.
 
 Return 5-12 lowercase single-or-two-word search keywords likely to match community thread titles about this topic. Include obvious synonyms, singular/plural variants, and common misspellings users actually type (e.g. for "Credits": credits, credit, generative credits, out of credits, credit refund).
 
-Keywords must be plain search terms only — no punctuation, no quotes, no boolean operators, all lowercase.`
+Keywords must be plain search terms only, no punctuation, no quotes, no boolean operators, all lowercase.`
 
   const prompt = !hasPatterns
     ? `${base}

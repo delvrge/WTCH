@@ -1,4 +1,4 @@
-// Verbatim reuse of supabase/functions/_shared/tags.ts's list — the closed
+// Verbatim reuse of supabase/functions/_shared/tags.ts's list, the closed
 // set of tags used on your community platform's threads. This is
 // deployment-specific vocabulary; set it via the NEXT_PUBLIC_COMMUNITY_TAGS
 // env var as a JSON array of strings (client-side, hence the NEXT_PUBLIC_

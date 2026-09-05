@@ -1,11 +1,11 @@
 // Drafts a next-step reply for a case where the user answered back after the
-// operator already replied (a 'user_replied' case — see check-case-replies).
+// operator already replied (a 'user_replied' case, see check-case-replies).
 // Grounds strictly in what's actually there: the thread's own post, the
 // reply already on record for this case, and the user's own newest follow-up
-// — never invents a new fix. Same evidence-only discipline as draft-from-case.
+//, never invents a new fix. Same evidence-only discipline as draft-from-case.
 //
 // Called lazily from CaseConversationModal, only when the operator actually
-// opens the popup — not on every unread detection, so a case that never gets
+// opens the popup, not on every unread detection, so a case that never gets
 // looked at never costs an Gemini call.
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts'
@@ -82,11 +82,11 @@ ${userReply}
 Rules:
 - Only use facts present above. Do not invent a new fix or troubleshooting step that isn't grounded in what we already told them or what they just said.
 - If their follow-up says the fix worked, thank them and close it out briefly.
-- If their follow-up says it did NOT work, or asks a new question, respond to exactly that — do not repeat the same advice verbatim if they said it didn't help.
+- If their follow-up says it did NOT work, or asks a new question, respond to exactly that, do not repeat the same advice verbatim if they said it didn't help.
 - If their follow-up genuinely doesn't give you enough to say anything useful, say so plainly rather than padding with generic troubleshooting.
 - Write in English, always, even when the post or their reply is in another language. Translate, don't quote the original wording.
 - Plain, warm, professional support voice. No corporate filler.
-- 2 to 5 sentences. No greeting, no sign-off — the operator adds those.
+- 2 to 5 sentences. No greeting, no sign-off, the operator adds those.
 - Never use an em dash (—); use a period, comma, or "and" instead.
 
 Respond with ONLY the reply text, nothing else.`

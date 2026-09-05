@@ -2,7 +2,7 @@ import { getEnv } from './env.ts'
 // Source helpers for a community forum running the inSided/Gainsight
 // platform. All public pages, no auth needed.
 //
-// Host and board scope are deployment config, not hardcoded — set
+// Host and board scope are deployment config, not hardcoded, set
 // COMMUNITY_HOST (e.g. "community.example.com") and WATCHED_BOARDS (a
 // comma-separated list of board slugs) as environment variables per
 // deployment. WATCHED_BOARDS empty means "no board-scoping": every board
@@ -10,7 +10,7 @@ import { getEnv } from './env.ts'
 //
 // discoverTopics() and fetchThread() are intentionally isolated behind this
 // module so that if/when the platform exposes an official community API,
-// only the bodies of these two functions need to change — callers
+// only the bodies of these two functions need to change, callers
 // (community-search, extract-pattern) are unaffected.
 
 const USER_AGENT = 'CommunityWatch/1.0'
@@ -20,7 +20,7 @@ const TOPIC_FETCH_DELAY_MS = 300
 const DEFAULT_DISCOVER_LIMIT = 25
 // Each sitemap-topics-N.xml is ~4MB; scanning up to 30 of them serially
 // (fetch + regex-parse each) was blowing past the edge function's
-// CPU-time/wall-clock budget (HTTP 546 WORKER_LIMIT). Capped lower — the
+// CPU-time/wall-clock budget (HTTP 546 WORKER_LIMIT). Capped lower, the
 // candidateCap break usually kicks in well before this anyway.
 const MAX_TOPIC_SITEMAPS = 8
 const DEFAULT_MAX_AGE_DAYS = 180
@@ -66,7 +66,7 @@ export interface ThreadAnswer {
   /** The badge text behind `is_staff`, e.g. "Community Expert". */
   badge?: string | null
   /**
-   * True when the asker or a moderator marked THIS reply as the solution —
+   * True when the asker or a moderator marked THIS reply as the solution ,
    * the green "Correct Answer" box on the page.
    *
    * Set from the QAPage `acceptedAnswer` in the page's JSON-LD. Which schema
@@ -87,7 +87,7 @@ export interface ThreadAnswer {
   author_url?: string | null
   /**
    * The answer's own `dateCreated`/`datePublished` from JSON-LD, when
-   * present. Falls back to the THREAD's date when the answer carries none —
+   * present. Falls back to the THREAD's date when the answer carries none ,
    * deliberately conservative: a reply is always newer than its thread, so a
    * thread-date fallback can wrongly EXCLUDE a recent reply on an old
    * thread, but can never wrongly INCLUDE a stale one. `null` only when
@@ -99,7 +99,7 @@ export interface ThreadAnswer {
    *
    * The JSON-LD `text` field above is the platform's plain-text rendering and never
    * carries images. The actual formatted HTML (images included) only exists
-   * in the page's React hydration data — a `data-props="..."` blob elsewhere
+   * in the page's React hydration data, a `data-props="..."` blob elsewhere
    * on the page keyed by the same `publicReplyId` this answer's JSON-LD
    * `url` links to via `?postid=`. See extractReplyContentById below. Only
    * ordinary https:// attachments are kept; inline `data:` URIs seen in
@@ -122,8 +122,8 @@ function sleep(ms: number): Promise<void> {
 
 /**
  * Thrown by fetchText() on a non-OK HTTP response, carrying the status code
- * so callers can tell "page gone (404) — normal, sitemap went stale" apart
- * from "the platform is rate-limiting/erroring (429/5xx) — worth surfacing" without
+ * so callers can tell "page gone (404), normal, sitemap went stale" apart
+ * from "the platform is rate-limiting/erroring (429/5xx), worth surfacing" without
  * parsing the message string.
  */
 export class CommunityFetchError extends Error {
@@ -163,7 +163,7 @@ function canonicalUrl(raw: string): string {
  * HTTP header values are ISO-8859-1 per spec, so a `Location` carrying a
  * non-ASCII path comes back as mojibake: the three bytes of 我 (E6 88 91) are
  * handed over as the three characters æ, <U+0088>, <U+0091>. Percent-encoding
- * THAT produces %C3%A6%C2%88%C2%91 — a different address, which redirects
+ * THAT produces %C3%A6%C2%88%C2%91, a different address, which redirects
  * again, mangled a little further each hop, until the runtime gives up. This
  * is the real cause of the "Maximum number of redirects (20)" failures on
  * Chinese, Arabic and Cyrillic thread titles.
@@ -245,7 +245,7 @@ async function fetchText(url: string, timeoutMs: number = FETCH_TIMEOUT_MS): Pro
   }
 }
 
-// Extracts <loc>...</loc> values from a sitemap XML document via regex —
+// Extracts <loc>...</loc> values from a sitemap XML document via regex ,
 // avoids pulling in a full XML parser dependency for this simple shape.
 function extractLocs(xml: string): string[] {
   const matches = xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)
@@ -292,14 +292,14 @@ export function parseTopicUrl(url: string): { category: string; slug: string; to
  *
  * Ordering/limit tradeoff: because we now sort by `lastmod` DESCENDING
  * before applying `limit`, we can no longer stop the very first moment we
- * hit `limit` matches while walking sitemaps — a later-scanned sitemap
+ * hit `limit` matches while walking sitemaps, a later-scanned sitemap
  * could still contain newer topics than ones already collected. To keep
  * this bounded without downloading all 30 sitemaps (~120MB), we exploit
  * the fact that higher-numbered sitemap-topics-N.xml files hold newer
  * topics: scan in REVERSE order (N=30 down to 1) and stop once we've
  * collected at least `limit * CANDIDATE_MULTIPLIER` candidates, or we run
  * out of sitemaps. Only then do we sort by lastmod and slice to `limit`.
- * This is a heuristic, not a guarantee of true global recency — but given
+ * This is a heuristic, not a guarantee of true global recency, but given
  * the reverse scan order and a generous multiplier, it's very unlikely to
  * miss a genuinely newer match.
  *
@@ -313,7 +313,7 @@ export function parseTopicUrl(url: string): { category: string; slug: string; to
  * Lets the operator paste a link where a title used to go, without adding a
  * second input: text that isn't a link falls through untouched, and a link with
  * a sentence around it still resolves. Board/profile/search urls return null on
- * purpose — only a topic can be fetched into thread content.
+ * purpose, only a topic can be fetched into thread content.
  */
 export function extractCommunityUrl(text: string): string | null {
   const hostPattern = COMMUNITY_HOST.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -337,7 +337,7 @@ export function normalizeSlugText(slug: string): string {
 
 /**
  * Word tokens straight out of arbitrary text, in whatever language it was
- * written — no translation, no stopword list. `\p{L}\p{N}` is Unicode-aware,
+ * written, no translation, no stopword list. `\p{L}\p{N}` is Unicode-aware,
  * so this works the same for "cannot generate images", "no tengo acceso al
  * producto" and "не увеличивается изображение". Used alongside the
  * AI-generated (English-biased) keyword set so discovery still finds a
@@ -352,7 +352,7 @@ export function titleTokensAnyLanguage(text: string): string[] {
  * How well one topic slug answers a keyword set.
  *
  * People describe the same problem with different words, so a keyword only
- * has to have all of ITS words somewhere in the slug — not adjacent, not in
+ * has to have all of ITS words somewhere in the slug, not adjacent, not in
  * order. "sync connector" therefore matches
  * "sync-connector-for-chat-gpt-stopped-working", and so does "connector
  * problems" via its "connector" half being present while "problems" is not…
@@ -396,7 +396,7 @@ export async function discoverTopics(
   // each make exactly one call. Callers that may invoke discoverTopics more
   // than once per request (draft-reply: two searchCommunity passes plus
   // findSelfMatchThread) pass a single shared deadline instead, so the calls
-  // don't each get their own fresh 15s and stack into a 546 — see
+  // don't each get their own fresh 15s and stack into a 546, see
   // draft-reply/index.ts's DISCOVERY_TIME_BUDGET_MS.
   deadlineMs?: number,
 ): Promise<DiscoveredTopic[]> {
@@ -420,7 +420,7 @@ export async function discoverTopics(
   const cutoffMs = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000
   // Ranking is only as good as the pool it ranks. `limit * CANDIDATE_MULTIPLIER`
   // is 40 for a 10-result request, which the first sitemap fills within its
-  // first few thousand entries — so the scan used to stop before ever seeing
+  // first few thousand entries, so the scan used to stop before ever seeing
   // the topics that actually match best. The time budget below is the real
   // guard; this cap only exists to stop unbounded memory growth.
   const candidateCap = Math.max(limit * CANDIDATE_MULTIPLIER, MIN_CANDIDATE_POOL)
@@ -430,15 +430,15 @@ export async function discoverTopics(
 
   // NOTE: candidateCap is the intended early-exit, but it only fires once a
   // candidate has actually SCORED (score > 0 in the loop below). Keywords in
-  // a script the target site never uses (e.g. a non-English post title —
+  // a script the target site never uses (e.g. a non-English post title ,
   // see titleTokensAnyLanguage) score 0 against every English slug, so
   // candidateCap can never be reached and the deadline below becomes the
-  // ONLY exit — the scan runs to its full budget on every such call instead
+  // ONLY exit, the scan runs to its full budget on every such call instead
   // of short-circuiting early the way a well-matching English query does.
   for (let i = 0; i < Math.min(orderedSitemapUrls.length, MAX_TOPIC_SITEMAPS); i++) {
     if (candidates.length >= candidateCap) break
     // Bail out of the scan (not the whole request) once we're eating into
-    // the invocation's wall-clock budget — return partial results rather
+    // the invocation's wall-clock budget, return partial results rather
     // than risk a 546 WORKER_LIMIT.
     if (Date.now() >= deadline) break
 
@@ -446,12 +446,12 @@ export async function discoverTopics(
     try {
       sitemapXml = await fetchText(orderedSitemapUrls[i])
     } catch {
-      // A single missing/broken topic sitemap shouldn't abort discovery —
+      // A single missing/broken topic sitemap shouldn't abort discovery ,
       // skip it and keep going.
       continue
     }
 
-    // Parse and discard each sitemap's XML immediately (each is ~4MB) —
+    // Parse and discard each sitemap's XML immediately (each is ~4MB) ,
     // only the small extracted entries are retained.
     const urlEntries = extractUrlEntries(sitemapXml)
     for (const { loc: url, lastmod } of urlEntries) {
@@ -463,7 +463,7 @@ export async function discoverTopics(
       // board-scoping at all.
       if (WATCHED_BOARDS.length && !WATCHED_BOARDS.includes(parsed.category)) continue
 
-      // `categories` is an OPTIONAL further narrowing within WATCHED_BOARDS —
+      // `categories` is an OPTIONAL further narrowing within WATCHED_BOARDS ,
       // empty/omitted means "every watched board".
       if (lowerCategories?.length && !lowerCategories.some((c) => parsed.category.toLowerCase().includes(c))) {
         continue
@@ -515,7 +515,7 @@ function extractJsonLdBlocks(html: string): any[] {
     try {
       blocks.push(JSON.parse(m[1].trim()))
     } catch {
-      // Skip unparseable blocks — the QAPage block, if present, will still
+      // Skip unparseable blocks, the QAPage block, if present, will still
       // be found among the others.
     }
   }
@@ -541,7 +541,7 @@ const AUTHORITY_BADGES = [
 
 // Operator-maintained list of known Community Managers / Community Experts,
 // matched by exact name. Takes priority over the badge-proximity guess
-// below. Set via the TRUSTED_AUTHORS env var (comma-separated names) —
+// below. Set via the TRUSTED_AUTHORS env var (comma-separated names) ,
 // empty by default. Adding a name requires redeploying the functions that
 // import this module.
 export const TRUSTED_AUTHORS = (getEnv('TRUSTED_AUTHORS') ?? '')
@@ -569,7 +569,7 @@ export const AUTHORITY_MAX_AGE_MONTHS = 12
 /**
  * Whether `createdAt` is within `AUTHORITY_MAX_AGE_MONTHS` of `now`.
  *
- * An unknown date (`null`, or a string that doesn't parse) returns `false` —
+ * An unknown date (`null`, or a string that doesn't parse) returns `false` ,
  * unknown age is NOT citable, never assumed recent. Never throws on a
  * malformed date string.
  */
@@ -592,8 +592,8 @@ export function citableAuthorityAnswers(thread: ThreadContent): ThreadAnswer[] {
 }
 
 // Best-effort: look for one of the badge strings above near an author's name
-// in the raw HTML. This is NOT reliable — the JSON-LD has no role field at
-// all — so callers must treat `is_staff === null` as "unknown", not "false".
+// in the raw HTML. This is NOT reliable, the JSON-LD has no role field at
+// all, so callers must treat `is_staff === null` as "unknown", not "false".
 function guessIsStaff(html: string, authorName: string | null): boolean | null {
   if (!authorName) return null
   if (isTrustedAuthor(authorName)) return true
@@ -645,8 +645,8 @@ function collectReplyContent(node: unknown, byId: Map<string, string>): void {
 /**
  * Maps `publicReplyId -> raw content HTML` for every reply embedded in the
  * page's React hydration data (one or more `data-props="..."` attributes).
- * This is the only place on the page a reply's real formatted body —
- * screenshots included — actually lives; the JSON-LD `fetchThread` otherwise
+ * This is the only place on the page a reply's real formatted body ,
+ * screenshots included, actually lives; the JSON-LD `fetchThread` otherwise
  * relies on only ever carries plain text. Best-effort: a `data-props` blob
  * that isn't valid JSON once decoded is silently skipped rather than failing
  * the whole fetch, since this is a supplementary lookup, not the primary
@@ -661,7 +661,7 @@ function extractReplyContentById(html: string): Map<string, string> {
       collectReplyContent(JSON.parse(decodeHtmlEntities(m[1])), byId)
     } catch {
       // Not every data-props blob on the page carries reply content (most
-      // don't) — an unparseable one is simply not that blob.
+      // don't), an unparseable one is simply not that blob.
     }
   }
   return byId
@@ -679,7 +679,7 @@ function extractImageUrls(contentHtml: string): string[] {
 }
 
 // The JSON-LD answer's own `url` links to the same reply via
-// `?postid=<publicReplyId>#post<publicReplyId>` — the join key back into
+// `?postid=<publicReplyId>#post<publicReplyId>`, the join key back into
 // extractReplyContentById's map.
 function replyIdFromAnswerUrl(url: unknown): string | null {
   if (typeof url !== 'string') return null
@@ -721,7 +721,7 @@ export async function fetchThread(url: string): Promise<ThreadContent> {
     title = mainEntity.name
     body = mainEntity.text
     if (!title || !body) {
-      throw new Error(`QAPage mainEntity for ${url} is missing name/text — cannot build thread content`)
+      throw new Error(`QAPage mainEntity for ${url} is missing name/text, cannot build thread content`)
     }
     authorName = mainEntity.author?.name ?? null
     createdAt = mainEntity.dateCreated ?? null
@@ -741,7 +741,7 @@ export async function fetchThread(url: string): Promise<ThreadContent> {
     title = forumBlock.headline
     body = forumBlock.text || forumBlock.articleBody
     if (!title || !body) {
-      throw new Error(`DiscussionForumPosting for ${url} is missing headline/text — cannot build thread content`)
+      throw new Error(`DiscussionForumPosting for ${url} is missing headline/text, cannot build thread content`)
     }
     authorName = forumBlock.author?.name ?? null
     createdAt = forumBlock.datePublished ?? null
@@ -750,7 +750,7 @@ export async function fetchThread(url: string): Promise<ThreadContent> {
     if (Array.isArray(comments)) rawAnswers.push(...comments)
     else if (comments) rawAnswers.push(comments)
   } else {
-    throw new Error(`No QAPage or DiscussionForumPosting JSON-LD block found for ${url} — page structure may have changed`)
+    throw new Error(`No QAPage or DiscussionForumPosting JSON-LD block found for ${url}, page structure may have changed`)
   }
 
   const replyContentById = extractReplyContentById(html)

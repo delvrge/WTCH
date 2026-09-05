@@ -1,5 +1,5 @@
 // Single place every AI call in this project goes through. Swapping models
-// or providers means editing here only — callers never touch a provider URL.
+// or providers means editing here only, callers never touch a provider URL.
 
 const GEMINI_CHAT_MODEL = 'gemini-flash-latest'
 const GEMINI_EMBED_MODEL = 'gemini-embedding-001'
@@ -13,7 +13,7 @@ function sleep(ms: number): Promise<void> {
 }
 
 // Gemini's flash-latest alias occasionally 503s under load ("high demand,
-// try again later") — a capacity blip, not a real failure. Retried a couple
+// try again later"), a capacity blip, not a real failure. Retried a couple
 // times with backoff before giving up, so a transient spike doesn't surface
 // as an error to the operator.
 const RETRYABLE_STATUSES = new Set([429, 500, 503])
@@ -59,7 +59,7 @@ async function chat(opts: {
 }
 
 /** Chat completion constrained to JSON output. Returns the raw JSON string
- *  the model wrote — callers parse it themselves, same as the OpenAI shape
+ *  the model wrote, callers parse it themselves, same as the OpenAI shape
  *  they were written against. */
 export async function chatJSON(opts: {
   apiKey: string
@@ -70,7 +70,7 @@ export async function chatJSON(opts: {
   return chat({ ...opts, json: true })
 }
 
-/** Chat completion returning plain text — for prompts that ask for prose,
+/** Chat completion returning plain text, for prompts that ask for prose,
  *  not a JSON object. */
 export async function chatText(opts: {
   apiKey: string
@@ -82,7 +82,7 @@ export async function chatText(opts: {
 }
 
 /** Embeds text at the fixed 1536 dimension every stored embedding in this
- *  project uses. Nothing else may embed with different settings — the
+ *  project uses. Nothing else may embed with different settings, the
  *  vectors would not be comparable. */
 export async function embed(opts: { apiKey: string; text: string }): Promise<number[]> {
   let lastError = ''

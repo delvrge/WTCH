@@ -2,7 +2,7 @@
 -- crawl-support-docs walks up to 400 pages (120s internal budget) and
 -- persists into support_docs. Vendor documentation changes slowly, and
 -- 400 pages against their servers is not something to hammer every 30
--- minutes like refine-clusters does — once a day is enough to keep the
+-- minutes like refine-clusters does, once a day is enough to keep the
 -- corpus from going stale without being a noisy neighbor to their site.
 --
 -- Same Vault convention as refine-clusters: the service-role key is never

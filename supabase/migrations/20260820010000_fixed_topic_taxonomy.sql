@@ -1,7 +1,7 @@
 -- Replaces the self-organizing cluster system (community_clusters +
 -- refine-clusters' merge/split/retopic phases) with a FIXED, locked
 -- 9-topic/27-subtopic taxonomy. HDBSCAN found no stable cluster count on
--- this corpus (a topical continuum, not density-separated groups — see
+-- this corpus (a topical continuum, not density-separated groups, see
 -- scripts/topic-taxonomy/), so an LLM map-reduce pass over post titles
 -- proposed this taxonomy directly, and it was reviewed and locked by hand.
 -- Canonical list: lib/topic-taxonomy.ts (app) / mirrored at
@@ -9,7 +9,7 @@
 --
 -- community_clusters itself, cluster_evolution_log,
 -- community_patterns.cluster/cluster_id, and verified_answers.cluster_id
--- are all DELIBERATELY NOT touched here — they stay until a later, separate
+-- are all DELIBERATELY NOT touched here, they stay until a later, separate
 -- migration once the fixed taxonomy is confirmed working, dropping all of
 -- it together in one pass (nothing here reads or writes those anymore, but
 -- historical rows keep whatever they already had).
@@ -18,7 +18,7 @@ ALTER TABLE public.community_patterns
   ADD COLUMN subtopic TEXT;
 
 COMMENT ON COLUMN public.community_patterns.subtopic IS
-  'Fixed taxonomy — see lib/topic-taxonomy.ts. One of the 27 locked subtopics, or "Unclustered". NULL on patterns extracted before the fixed taxonomy replaced the self-organizing cluster system; a later one-time batch pass reclassifies those.';
+  'Fixed taxonomy, see lib/topic-taxonomy.ts. One of the 27 locked subtopics, or "Unclustered". NULL on patterns extracted before the fixed taxonomy replaced the self-organizing cluster system; a later one-time batch pass reclassifies those.';
 
 -- `topic` already existed (added 20260816000500_cluster_topics.sql) as a
 -- free-text column written by the old self-organizing prompt (values like
@@ -56,7 +56,7 @@ ALTER TABLE public.community_patterns
 -- refine-clusters (merge/split/retopic + backlog sweep) and stage-ai-drafts
 -- (auto-staged AI drafts keyed by cluster_id/suggested_replies) are both
 -- deleted (supabase/functions/refine-clusters,
--- supabase/functions/stage-ai-drafts) — retired outright rather than
+-- supabase/functions/stage-ai-drafts), retired outright rather than
 -- repurposed. Drafting is manual-per-case only now (existing draft-reply
 -- flow). Guarded with an existence check since the job row is created by
 -- cron.schedule() regardless of whether the Vault secret step was ever

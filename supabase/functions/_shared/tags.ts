@@ -1,6 +1,6 @@
 import { getEnv } from './env.ts'
 // The closed set of tags used on your community platform's threads. This is
-// deployment-specific vocabulary, not something this tool can guess — set it
+// deployment-specific vocabulary, not something this tool can guess, set it
 // via the COMMUNITY_TAGS env var as a JSON array of strings, e.g.
 // '["Bug","Feature Request","How To","Billing","Account"]'. A pattern's tags
 // must match one of these exactly to mean anything on the board; suggest-tags
@@ -28,7 +28,7 @@ function loadCommunityTags(): readonly string[] {
   } catch {
     // Falls through to the default below on malformed JSON.
   }
-  console.warn('[tags] COMMUNITY_TAGS env var is set but not a valid JSON string array — using defaults')
+  console.warn('[tags] COMMUNITY_TAGS env var is set but not a valid JSON string array, using defaults')
   return DEFAULT_COMMUNITY_TAGS
 }
 

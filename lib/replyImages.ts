@@ -4,7 +4,7 @@
 // Replies editor supported inline images (see components/RichTextEditor.tsx
 // and lib/richText.ts, which embed a picked/pasted image directly in
 // answer_html as a data URI instead). Nothing writes a new row into
-// verified_answer_images any more — these helpers only read, sign and
+// verified_answer_images any more, these helpers only read, sign and
 // delete what pre-existing rows already have, so old attachments stay
 // visible and removable rather than orphaned.
 
@@ -27,7 +27,7 @@ export async function deleteReplyImage(image: VerifiedAnswerImage): Promise<void
   if (deleteError) throw new Error(deleteError.message || 'Could not delete image record.')
 }
 
-// Signed URLs are generated on demand and never persisted — the bucket is
+// Signed URLs are generated on demand and never persisted, the bucket is
 // private, and a stored signed URL would just go stale.
 export async function signImagePaths(paths: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>()
@@ -50,7 +50,7 @@ export async function signImagePaths(paths: string[]): Promise<Map<string, strin
  * later. A signed Storage URL cannot do that: the bucket is private and the
  * signature expires, so the pasted post would render broken images once the
  * link lapsed. Inlining the bytes makes the clipboard payload self-contained
- * — the paste target never has to fetch anything.
+ *, the paste target never has to fetch anything.
  */
 export async function imagesAsDataUris(images: VerifiedAnswerImage[]): Promise<string[]> {
   const out: string[] = []

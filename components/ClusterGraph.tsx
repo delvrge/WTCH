@@ -6,12 +6,12 @@ import { errorMessage } from '@/lib/supabase'
 import { ALL_TOPICS, countByTopicSubtopic } from '@/lib/topic-taxonomy'
 
 // A force-directed overview of the fixed taxonomy, rooted at a single fixed
-// product hub in the app's accent color — every topic hangs off it, and every
-// subtopic hangs off its topic. Deliberately three levels only — patterns
+// product hub in the app's accent color, every topic hangs off it, and every
+// subtopic hangs off its topic. Deliberately three levels only, patterns
 // themselves don't appear here; that granularity belongs to Library's list
 // + search. This is a vibes/overview picture, not a lookup tool. Zero new
 // dependencies: plain canvas + a hand-rolled force simulation. Reads
-// community_patterns.topic/subtopic directly (see lib/topic-taxonomy.ts) —
+// community_patterns.topic/subtopic directly (see lib/topic-taxonomy.ts) ,
 // every topic/subtopic node always renders, even at zero count, since the
 // taxonomy is fixed rather than data-driven.
 
@@ -50,7 +50,7 @@ interface Edge {
 const MAX_TICKS = 320
 // Fallback CSS-pixel height, used only before the container has been
 // measured (e.g. the very first layout pass). Once mounted, both width and
-// height track the canvas's actual rendered box via ResizeObserver — see
+// height track the canvas's actual rendered box via ResizeObserver, see
 // the resize-handling effect below.
 const FALLBACK_HEIGHT = 620
 
@@ -58,7 +58,7 @@ const FALLBACK_HEIGHT = 620
 // over time (same trick d3-force uses as "alpha"). Without it, repulsion +
 // spring + gravity keep re-injecting exactly as much energy as velocity
 // damping removes, so the system finds a permanent low-amplitude limit
-// cycle instead of a resting layout — verified empirically: with constant-
+// cycle instead of a resting layout, verified empirically: with constant-
 // magnitude forces, kinetic energy plateaus around ~2800 (vs. the ~3.5
 // threshold below) even after 2000 ticks, and denser graphs end up with
 // hundreds of overlapping node pairs because the layout never finishes
@@ -74,7 +74,7 @@ const LABEL_PAD = 12
 
 // While a node is being dragged the rest of the graph is relaxed one step
 // per frame so it trails behind rather than snapping. DRAG_ALPHA is the
-// fixed "temperature" that pass runs at — high enough that neighbours visibly
+// fixed "temperature" that pass runs at, high enough that neighbours visibly
 // flow, low enough that the layout doesn't explode. DRAG_DAMPING below 1
 // bleeds off velocity so motion settles instead of oscillating forever.
 const DRAG_ALPHA = 0.35
@@ -96,7 +96,7 @@ function colorForIndex(i: number): string {
 // Keeps the canvas backing store (device pixels) matched to its logical
 // CSS size at the current devicePixelRatio. Called on initial layout, on
 // container resize, and on DPR change (e.g. dragging the window to a
-// different-density monitor) — see the resize-handling effect below. Kept
+// different-density monitor), see the resize-handling effect below. Kept
 // as a standalone function (not touching canvas.style.width/height) so it
 // never fights the CSS layout that makes the canvas responsive.
 function syncCanvasResolution(canvas: HTMLCanvasElement, logicalWidth: number, logicalHeight: number) {
@@ -108,7 +108,7 @@ function syncCanvasResolution(canvas: HTMLCanvasElement, logicalWidth: number, l
 }
 
 // Clamps a node's distance from center to a circle instead of clamping x/y
-// independently to a rectangle — this is what makes the whole layout read
+// independently to a rectangle, this is what makes the whole layout read
 // as a sphere/medallion (nodes that hit the boundary sit right on a clean
 // circular rim) rather than spreading out to fill the canvas's corners.
 function clampToCircle(n: Node, cx: number, cy: number, boundaryRadius: number) {
@@ -174,7 +174,7 @@ function runSimulation(nodes: Node[], edges: Edge[], width: number, height: numb
     }
 
     for (const n of nodes) {
-      // The root hub is pinned dead-center — it's the one fixed point
+      // The root hub is pinned dead-center, it's the one fixed point
       // everything else hangs off, not another body the sim is free to
       // shove around.
       if (n.kind === 'root') { n.vx = 0; n.vy = 0; n.x = cx; n.y = cy; continue }
@@ -197,7 +197,7 @@ function runSimulation(nodes: Node[], edges: Edge[], width: number, height: numb
 // pulls its two ends toward a rest length, neighbours get dragged along the
 // chain, and damping turns what would be rigid snapping into a trailing,
 // fluid motion. The dragged node itself is pinned to the cursor and never
-// integrated here — it is the thing everything else is reacting to.
+// integrated here, it is the thing everything else is reacting to.
 function relaxStep(
   nodes: Node[],
   edges: Edge[],
@@ -270,7 +270,7 @@ export default function ClusterGraph() {
   // Mirrors draggingIdRef purely so the cursor can re-render; the ref itself
   // is what the animation loop reads, since that must not trigger renders.
   const [dragging, setDragging] = useState(false)
-  // Logical (CSS-pixel) canvas size — node x/y and all drawing stay in this
+  // Logical (CSS-pixel) canvas size, node x/y and all drawing stay in this
   // space; the backing store is scaled up separately for crisp rendering on
   // high-DPI screens (see the ctx.setTransform calls in the render effect).
   const sizeRef = useRef({ width: 800, height: FALLBACK_HEIGHT })
@@ -298,9 +298,9 @@ export default function ClusterGraph() {
         const nodes: Node[] = []
         const topicIndex = new Map<string, number>()
 
-        // Seed positions on a wheel — topics evenly spaced around a ring
+        // Seed positions on a wheel, topics evenly spaced around a ring
         // centered on the fixed root hub, each topic's subtopics fanned
-        // in a small arc just outside it — instead of dropping every node
+        // in a small arc just outside it, instead of dropping every node
         // at a random point. The force simulation below still runs (so
         // nothing actually overlaps), but starting from an already-
         // organized layout makes it settle into a clean radial shape
@@ -393,7 +393,7 @@ export default function ClusterGraph() {
         edgesRef.current = edges
         sizeRef.current = { width, height }
 
-        // Backing-store resolution only — canvas.style.width/height is left
+        // Backing-store resolution only, canvas.style.width/height is left
         // alone so the CSS layout (width: 100%, see the JSX below) keeps
         // driving the on-screen size; pinning it to a px value here would
         // freeze the canvas at whatever the container measured at mount and
@@ -412,7 +412,7 @@ export default function ClusterGraph() {
   }, [])
 
   // Keeps the canvas matched to its container and to the display's current
-  // DPR for the component's whole lifetime — the initial sizing in load()
+  // DPR for the component's whole lifetime, the initial sizing in load()
   // above only runs once, so without this the canvas would go stale (wrong
   // resolution, or wrong logical width vs. its actual on-screen box) after
   // any container resize or after dragging the window to a monitor with a
@@ -422,7 +422,7 @@ export default function ClusterGraph() {
     if (!canvas) return
 
     // The canvas is CSS-sized (width: 100%, height: 100% of its flex
-    // parent — see globals.css), so both dimensions can change, not just
+    // parent, see globals.css), so both dimensions can change, not just
     // width: the height now tracks whatever the Context page's left column
     // measures out to, rather than a fixed constant. Existing node
     // positions are rescaled proportionally on either axis rather than
@@ -456,7 +456,7 @@ export default function ClusterGraph() {
     ro.observe(canvas)
 
     // devicePixelRatio has no native change event; the standard workaround
-    // is a self-resubscribing matchMedia query tuned to the current ratio —
+    // is a self-resubscribing matchMedia query tuned to the current ratio ,
     // it fires once when the ratio moves away from that value (zoom, or the
     // window crossing onto a different-density monitor), at which point we
     // resync the backing store and re-arm for the new ratio.
@@ -483,7 +483,7 @@ export default function ClusterGraph() {
   // Continuous slow float, not a one-shot render: once the sim has settled
   // (load() sets baseX/baseY), each frame nudges every node a few px around
   // its resting spot on its own sine wave, then redraws. Runs indefinitely
-  // while mounted — cancelled on unmount/reload so it never leaks.
+  // while mounted, cancelled on unmount/reload so it never leaks.
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas || loading || error) return
@@ -504,10 +504,10 @@ export default function ClusterGraph() {
         relaxStep(nodes, edgesRef.current, logicalW, logicalH, draggingIdRef.current)
       }
       for (const n of nodes) {
-        // The root hub is fixed dead-center — it never floats.
+        // The root hub is fixed dead-center, it never floats.
         if (n.kind === 'root') continue
         // A node being dragged has its x/y driven directly by the pointer
-        // (see handleMouseMove) — the float must not fight the cursor.
+        // (see handleMouseMove), the float must not fight the cursor.
         if (n.id === draggingIdRef.current) continue
         // A node the relax pass just moved must not also be float-animated
         // back toward a stale base, or it visibly fights the drag.
@@ -524,7 +524,7 @@ export default function ClusterGraph() {
       // load() above, so the graph renders crisp instead of blurry on
       // high-DPI screens.
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      // canvas fillStyle can't parse a CSS custom property directly — read
+      // canvas fillStyle can't parse a CSS custom property directly, read
       // the computed value out at draw time so labels still match theme.
       const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#ededed'
 
@@ -541,7 +541,7 @@ export default function ClusterGraph() {
       ctx.stroke()
 
       // Root hub: solid accent color, with a soft glow so it reads as the light
-      // source everything else radiates from — drawn first so topic blobs
+      // source everything else radiates from, drawn first so topic blobs
       // and edges layer on top of it, then its label drawn last of all
       // (after every other label) so it's never occluded.
       const root = nodes.find((n) => n.kind === 'root')
@@ -556,7 +556,7 @@ export default function ClusterGraph() {
         ctx.restore()
       }
 
-      // topic blobs (background), then cluster dots, then topic labels on top —
+      // topic blobs (background), then cluster dots, then topic labels on top ,
       // clusters never get a label drawn, by design.
       for (const n of nodes) {
         if (n.kind !== 'topic') continue
@@ -583,14 +583,14 @@ export default function ClusterGraph() {
         // Match the app's own font stack (app/globals.css) rather than a
         // generic one, and set alignment/baseline explicitly instead of
         // relying on canvas defaults. Draw position is rounded to the
-        // nearest CSS pixel — at fractional coordinates (nodes float on a
+        // nearest CSS pixel, at fractional coordinates (nodes float on a
         // sine wave every frame) glyph edges land between device pixels and
         // get anti-aliased into a soft, muddy smear instead of a crisp line.
         ctx.font = '12px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
         ctx.textBaseline = 'alphabetic'
         ctx.fillStyle = fgColor
         // Labels draw to the right of their node, so a node sitting near the
-        // right edge pushes its label off-canvas — clamping the node itself
+        // right edge pushes its label off-canvas, clamping the node itself
         // can't prevent that, since the overflow is text the node doesn't
         // know the width of. Measure it, and flip the label to the node's
         // left when it wouldn't fit on the right.
@@ -605,7 +605,7 @@ export default function ClusterGraph() {
         }
       }
 
-      // The root's own label: centered under the hub rather than beside it —
+      // The root's own label: centered under the hub rather than beside it ,
       // it's the fixed anchor, not one more node competing for label space.
       if (root) {
         ctx.font = 'bold 13px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
@@ -643,7 +643,7 @@ export default function ClusterGraph() {
     setDragging(Boolean(hit))
   }
 
-  // Dragging never lets a node leave the canvas — clamped to its own radius
+  // Dragging never lets a node leave the canvas, clamped to its own radius
   // on every side, same rule the settle simulation itself uses, so a
   // dropped node stays visible rather than getting dragged off-screen.
   function handleMouseMove(e: MouseEvent<HTMLCanvasElement>) {
@@ -657,7 +657,7 @@ export default function ClusterGraph() {
     const { width, height } = sizeRef.current
     node.x = e.clientX - rect.left
     node.y = e.clientY - rect.top
-    // Same circular rim the settle/relax passes enforce — dragging a node
+    // Same circular rim the settle/relax passes enforce, dragging a node
     // can push it toward the edge but never past the sphere's boundary.
     const cx = width / 2
     const cy = height / 2

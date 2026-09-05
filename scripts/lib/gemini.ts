@@ -1,4 +1,4 @@
-// Node-side counterpart to supabase/functions/_shared/ai-provider.ts — same
+// Node-side counterpart to supabase/functions/_shared/ai-provider.ts, same
 // Gemini models/shapes, but callable from tsx scripts (not Deno edge runtime).
 
 const GEMINI_CHAT_MODEL = 'gemini-flash-latest'
@@ -36,7 +36,7 @@ export async function chatJSON(opts: {
   return content
 }
 
-/** Batched counterpart to embed() — one HTTP round-trip for many texts,
+/** Batched counterpart to embed(), one HTTP round-trip for many texts,
  *  via Gemini's batchEmbedContents endpoint. */
 export async function embedBatch(opts: { apiKey: string; texts: string[] }): Promise<number[][]> {
   const res = await fetch(

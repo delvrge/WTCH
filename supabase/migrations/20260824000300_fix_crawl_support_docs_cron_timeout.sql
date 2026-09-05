@@ -6,12 +6,12 @@
 -- support_docs stayed empty (confirmed: 0 rows, every net._http_response
 -- row for this job has a null status_code/content, i.e. a client-side
 -- timeout, not a server error) despite cron.job_run_details showing every
--- run as "succeeded" — that status only means the SQL enqueued the request,
+-- run as "succeeded", that status only means the SQL enqueued the request,
 -- never that the HTTP call actually got a response.
 --
 -- (A second, now-fixed issue compounded this: the vault's service_role_key
 -- secret held a legacy JWT-style key rejected by the gateway after this
--- project moved to the new sb_secret_ format — a 401 on top of the timeout,
+-- project moved to the new sb_secret_ format, a 401 on top of the timeout,
 -- fixed by hand via vault.update_secret since the CLI never exposes a
 -- secret-type key's full value outside the dashboard, so it isn't
 -- migration-scriptable.)

@@ -1,14 +1,14 @@
 // The fixed, locked Topic/Subtopic taxonomy for community_patterns
 // classification. Replaces the old self-organizing community_clusters
 // system (AI-invented labels via embedding clustering + periodic
-// merge/split/retopic) — HDBSCAN found no stable cluster count on this
+// merge/split/retopic), HDBSCAN found no stable cluster count on this
 // corpus (a topical continuum, not density-separated groups), so an LLM
 // map-reduce pass over post titles proposed this taxonomy directly
 // (scripts/topic-taxonomy/5-llm-taxonomy.ts), and it was reviewed and
 // locked by hand.
 //
 // Mirrored at lib/topic-taxonomy.ts for the Next.js app (no cross-import
-// between the Next.js app and Supabase edge functions in this repo) — keep
+// between the Next.js app and Supabase edge functions in this repo), keep
 // both in sync by hand if this ever changes.
 
 export const UNCLUSTERED = 'Unclustered'

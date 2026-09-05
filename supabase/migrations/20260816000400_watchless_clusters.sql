@@ -1,6 +1,6 @@
 -- Fixes a bad assumption in 20260816000300: clusters were built watch-scoped,
 -- but this app has no Watches UI and the Dashboard's "Collect" button never
--- sends a watch_id — every pattern created through the actual product has
+-- sends a watch_id, every pattern created through the actual product has
 -- watch_id NULL. Under the prior NOT NULL constraint, none of them could
 -- ever get a cluster_id. Patterns with no watch now cluster together in
 -- their own group (still scoped to the user), same idea, one less

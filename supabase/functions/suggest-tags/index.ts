@@ -7,7 +7,7 @@ import { PRODUCT_NAME } from '../_shared/product.ts'
 
 // Advisory only: reads one pattern's issue_summary/typical_approach and
 // suggests which of the community platform's fixed tags (COMMUNITY_TAGS)
-// apply. Never writes anything — the operator reviews and saves the tags
+// apply. Never writes anything, the operator reviews and saves the tags
 // themselves from PatternDetail, same as every other AI suggestion in this
 // tool.
 
@@ -22,11 +22,11 @@ interface PatternRow {
 }
 
 function buildSystemPrompt(): string {
-  return `You tag a community forum post about ${PRODUCT_NAME} with the tags that apply to it, out of this FIXED list — you may only use tags from this exact list, copied verbatim, never invent or rephrase one:
+  return `You tag a community forum post about ${PRODUCT_NAME} with the tags that apply to it, out of this FIXED list, you may only use tags from this exact list, copied verbatim, never invent or rephrase one:
 
 ${COMMUNITY_TAGS.map((t) => `- ${t}`).join('\n')}
 
-You are given the post's issue summary, typical resolution approach, and (if known) which product surface it involves. Pick every tag that genuinely applies — usually 1-4. Prefer the more specific tag over a vague one when both could fit. Only use a generic catch-all tag (e.g. "General", "How To") when nothing more specific fits.
+You are given the post's issue summary, typical resolution approach, and (if known) which product surface it involves. Pick every tag that genuinely applies, usually 1-4. Prefer the more specific tag over a vague one when both could fit. Only use a generic catch-all tag (e.g. "General", "How To") when nothing more specific fits.
 
 Respond with ONLY a JSON object: { "tags": string[] }`
 }
@@ -98,7 +98,7 @@ serve(async (req) => {
       throw new Error('AI returned unparseable JSON')
     }
 
-    // The model's picks are a claim, not a fact — anything not an exact,
+    // The model's picks are a claim, not a fact, anything not an exact,
     // case-sensitive match to the fixed list is dropped rather than passed
     // through, since a near-miss tag is meaningless on the real board.
     const allowed = new Set(COMMUNITY_TAGS)

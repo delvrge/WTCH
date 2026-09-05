@@ -1,7 +1,7 @@
 -- One-off offline analysis staging table: raw scraped community board posts
 -- (title/body/date/url) for generating a fixed Topic/Subtopic taxonomy from
 -- a year of historical data. Deliberately isolated from community_patterns,
--- verified_answers, and community_clusters — nothing here is read by any
+-- verified_answers, and community_clusters, nothing here is read by any
 -- live case-tracking path, and this table is never written to by the app or
 -- any edge function. Populated only by the one-off scripts under
 -- scripts/topic-taxonomy/.

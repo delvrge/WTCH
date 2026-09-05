@@ -12,7 +12,7 @@ import type { InvestigateResponse } from '@/lib/investigate'
 import type { SuggestTagsResponse } from '@/lib/types'
 
 // Dashboard route is its own page component, so switching tabs and coming
-// back unmounts and remounts it — a walkthrough would otherwise vanish just
+// back unmounts and remounts it, a walkthrough would otherwise vanish just
 // from clicking Library and back. sessionStorage survives that (and a tab
 // reload), and is scoped to the browser tab, unlike localStorage.
 const DASHBOARD_STORAGE_KEY = 'wtch.dashboard.state'
@@ -39,12 +39,12 @@ function writeSnapshot(patch: Partial<DashboardSnapshot>) {
   try {
     sessionStorage.setItem(DASHBOARD_STORAGE_KEY, JSON.stringify({ ...readSnapshot(), ...patch }))
   } catch {
-    // Storage full/unavailable — state just won't survive this navigation.
+    // Storage full/unavailable, state just won't survive this navigation.
   }
 }
 
 // A run (Investigate itself, and the tag suggestion it kicks off) lives at
-// module scope, not component state — component state dies the moment the
+// module scope, not component state, component state dies the moment the
 // operator clicks another tab, which used to silently drop whatever the
 // call came back with. A plain in-flight promise survives client-side route
 // changes just fine (the module isn't reloaded, only the page component
@@ -62,7 +62,7 @@ const runListeners = new Set<(withResync: boolean) => void>()
 // sessionStorage" (a run finished, its result is now written). Notifying
 // with resync at the START of a run would read back the previous, stale
 // investigation and clobber the setInvestigation(null) a fresh run's own
-// caller just did — same bump, minus the data resync, fixes that.
+// caller just did, same bump, minus the data resync, fixes that.
 function notifyRunListeners(withResync: boolean) {
   runListeners.forEach(listen => listen(withResync))
 }
@@ -72,7 +72,7 @@ async function suggestTagsInBackground(patternId: string) {
   notifyRunListeners(false)
   try {
     const data = await callWatchFn<SuggestTagsResponse>('suggest-tags', { pattern_id: patternId })
-    // The model's picks are a claim, not a fact — anything not an exact
+    // The model's picks are a claim, not a fact, anything not an exact
     // COMMUNITY_TAGS member is dropped rather than shown (suggest-tags already
     // does this same filtering server-side; this is a second, independent
     // check on the client).
@@ -85,7 +85,7 @@ async function suggestTagsInBackground(patternId: string) {
       tagsSaved: false,
     })
   } catch {
-    // Advisory only — a failed suggestion just leaves the section empty;
+    // Advisory only, a failed suggestion just leaves the section empty;
     // the operator can hit Re-suggest. Nowhere to surface an error once
     // the page that started it may be long gone.
   } finally {
@@ -119,16 +119,16 @@ async function runInvestigateInBackground(
         void suggestTagsInBackground(data.auto_collected.pattern_id)
       } else {
         // url is null for a fallback collect (case built from the pasted
-        // text alone, no thread matched) — flagged for a manual link later,
+        // text alone, no thread matched), flagged for a manual link later,
         // not a failure, so this still reads as a success.
         toast.success(
-          data.auto_collected.url ? 'Added to library.' : 'Added to library — no thread matched, flagged for re-check.',
+          data.auto_collected.url ? 'Added to library.' : 'Added to library, no thread matched, flagged for re-check.',
         )
         void suggestTagsInBackground(data.auto_collected.pattern_id)
       }
     }
     if (data.errors.some(e => e.startsWith('auto-collect:'))) {
-      toast.error('Could not add to library — see the note below the walkthrough.')
+      toast.error('Could not add to library, see the note below the walkthrough.')
     }
   } catch (err) {
     toast.error(errorMessage(err, 'Investigation failed.'))
@@ -141,9 +141,9 @@ async function runInvestigateInBackground(
 // Paste a post link (or title, or a plain description), press Go. Runs the
 // investigate edge function: searches the tracker, the Library and past
 // solved threads at once, decides whether the case can be answered and
-// closed or still needs specifics gathered, and hands back a walkthrough —
+// closed or still needs specifics gathered, and hands back a walkthrough ,
 // what to do, in order, and which past case each step came from. Also
-// auto-collects the pasted case into the Library — core behavior, every
+// auto-collects the pasted case into the Library, core behavior, every
 // case pasted here ends up tracked, never silently dropped.
 export default function DashboardPage() {
   const [text, setText] = useState('')
@@ -151,7 +151,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('')
 
   // Tags, shown once a run auto-collects the pasted post's own thread
-  // (auto_collected.pattern_id) — there's no community_patterns row to save
+  // (auto_collected.pattern_id), there's no community_patterns row to save
   // tags onto otherwise, so the section only appears then.
   //
   // Default view is AI-recommended tags only, not the full COMMUNITY_TAGS wall.
@@ -167,7 +167,7 @@ export default function DashboardPage() {
 
   // Re-rendered whenever the background run (or its tag suggestion) starts
   // or finishes, so `busy`/`suggesting` below always reflect the module-
-  // level state even if this particular instance never started the run —
+  // level state even if this particular instance never started the run ,
   // e.g. it was mounted before the run began, or just remounted after it.
   const [, bump] = useState(0)
   const busy = inFlightText !== null
@@ -207,14 +207,14 @@ export default function DashboardPage() {
   }, [])
 
   // Keeps the typed-but-not-yet-submitted text alive across a tab switch
-  // too, not just a finished run's result — writeSnapshot merges, so this
+  // too, not just a finished run's result, writeSnapshot merges, so this
   // never clobbers investigation/tags written elsewhere.
   useEffect(() => {
     writeSnapshot({ text })
   }, [text])
 
   // Library's "Rerun" link lands here as /dashboard?text=<url or
-  // title>&run=1&pattern_id=<id> — re-investigating a case already tracked
+  // title>&run=1&pattern_id=<id>, re-investigating a case already tracked
   // without re-copying its link, and without auto-collect touching that
   // row again. Runs once per page load (after the sessionStorage restore
   // above, so an explicit link click wins over whatever was left in this

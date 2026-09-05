@@ -1,5 +1,5 @@
 -- Cron: stage AI-drafted replies every 30 minutes, same cadence as
--- refine-clusters (20260816000300_cluster_evolution.sql) — this function
+-- refine-clusters (20260816000300_cluster_evolution.sql), this function
 -- reads community_clusters/community_patterns state that refine-clusters
 -- produces, so running at the same interval keeps it working off
 -- reasonably fresh clustering without adding its own separate cadence to

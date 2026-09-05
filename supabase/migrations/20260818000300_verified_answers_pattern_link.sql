@@ -1,7 +1,7 @@
 -- Lets a verified answer (Tracker entry) point at the exact community
 -- pattern/thread it answers, and carry that thread's URL along for display.
 -- Purely descriptive: match_verified_answers still retrieves by embedding
--- similarity on question_summary, same as before — this does not change how
+-- similarity on question_summary, same as before, this does not change how
 -- a future post gets matched, it just lets the operator record which post a
 -- given answer was written for.
 

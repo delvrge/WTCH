@@ -43,12 +43,12 @@ export interface Pattern {
   last_seen: string
   created_at: string
   severity: 'low' | 'medium' | 'high' | null
-  /** Fixed taxonomy — see lib/topic-taxonomy.ts. Null on patterns extracted
+  /** Fixed taxonomy, see lib/topic-taxonomy.ts. Null on patterns extracted
    *  before the fixed taxonomy replaced the self-organizing cluster system. */
   topic: string | null
   subtopic: string | null
   /** First part of the email of whoever's session inserted this row (set by
-   *  a DB trigger, not the app) — shown in the Library so a shared
+   *  a DB trigger, not the app), shown in the Library so a shared
    *  workspace can tell cases apart by who added them. */
   added_by: string | null
 }
@@ -71,16 +71,16 @@ export interface VerifiedAnswer {
   subcategory: string | null
   question_summary: string
   answer_text: string
-  /** Rich HTML for answer_text, set only when the reply actually carries formatting (bold/lists/links/inline images) — the Replies screen renders/copies this when present, falling back to plain answer_text otherwise. */
+  /** Rich HTML for answer_text, set only when the reply actually carries formatting (bold/lists/links/inline images), the Replies screen renders/copies this when present, falling back to plain answer_text otherwise. */
   answer_html: string | null
   source_note: string | null
   /** The thread URL this answer was written for, when known. */
   source_url: string | null
   verified_at: string
   created_at: string
-  /** Whether this reply is confirmed correct — grounds/gets cited in future drafts and gets the green "verified" treatment in the UI. An ai_draft row starts false until reviewed. */
+  /** Whether this reply is confirmed correct, grounds/gets cited in future drafts and gets the green "verified" treatment in the UI. An ai_draft row starts false until reviewed. */
   verified: boolean
-  /** Which path wrote this row: a human action ('manual' — the Add-reply form, or ReplyBlock's "Save to Replies"), or stage-ai-drafts writing a draft on its own ('ai_draft'). */
+  /** Which path wrote this row: a human action ('manual', the Add-reply form, or ReplyBlock's "Save to Replies"), or stage-ai-drafts writing a draft on its own ('ai_draft'). */
   source: 'manual' | 'ai_draft'
   /** First part of the email of whoever's session inserted this row (set by
    *  a DB trigger, not the app). */

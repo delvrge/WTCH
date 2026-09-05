@@ -17,7 +17,7 @@
 -- ── community_clusters: give clusters a fingerprint too ─────────────────
 -- embedding is the cluster's centroid, set at creation from the founding
 -- pattern and refreshed by the refine pass after any merge/split. It is
--- deliberately NOT updated on every fast-path attach — precision drifts by
+-- deliberately NOT updated on every fast-path attach, precision drifts by
 -- at most one refine interval, which the periodic pass corrects, and that
 -- tradeoff is what keeps the fast path a pure read (no vector arithmetic).
 -- surface mirrors community_patterns.surface: the same metadata gate used
@@ -34,7 +34,7 @@ CREATE INDEX community_clusters_embedding_hnsw_idx
 
 -- ── community_patterns: severity, the one genuinely new structured field ──
 -- issue_summary already covers "symptom" and surface already covers
--- "product area" — severity is the only axis those don't capture. Nullable:
+-- "product area", severity is the only axis those don't capture. Nullable:
 -- older rows and threads where it can't be judged carry no value rather
 -- than a guessed default.
 
@@ -120,7 +120,7 @@ CREATE INDEX cluster_evolution_log_user_id_idx
   ON public.cluster_evolution_log (user_id, created_at DESC);
 
 -- ── Cron: refine every 30 minutes ─────────────────────────────────────────
--- pg_net's http_post reads the service-role key out of Vault at call time —
+-- pg_net's http_post reads the service-role key out of Vault at call time ,
 -- never written into this file, never in git history. Before this job can
 -- actually authenticate, run once in the Supabase SQL editor (not from a
 -- migration, so the secret is never committed):

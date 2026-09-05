@@ -42,7 +42,7 @@ COMMENT ON COLUMN public.community_patterns.source_thread_dates IS
 COMMENT ON COLUMN public.community_patterns.thread_created_at IS
   'The NEWEST date in source_thread_dates, so "is this pattern still current" is a single column read. Parsed from the thread JSON-LD (dateCreated for QAPage, datePublished for DiscussionForumPosting).';
 
--- Users manage their own patterns directly — all four RLS policies are needed.
+-- Users manage their own patterns directly, all four RLS policies are needed.
 ALTER TABLE public.community_patterns ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "users_read_own_community_patterns"
@@ -89,7 +89,7 @@ CREATE INDEX community_patterns_thread_created_at_idx
 
 -- ── Similarity search RPC ────────────────────────────────────────────────
 -- Returns the caller's own patterns whose embedding is close to the query
--- embedding. SECURITY INVOKER (not DEFINER) so RLS still applies — this runs
+-- embedding. SECURITY INVOKER (not DEFINER) so RLS still applies, this runs
 -- as the requesting user.
 
 CREATE OR REPLACE FUNCTION public.match_community_patterns(

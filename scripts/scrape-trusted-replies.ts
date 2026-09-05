@@ -1,6 +1,6 @@
 // One-time (re-runnable) backfill: pulls each trusted CM/CE's own reply
 // history from their community platform profile, going back CUTOFF_MONTHS,
-// and stores each (problem, their specific reply) pair in trusted_replies —
+// and stores each (problem, their specific reply) pair in trusted_replies ,
 // see migration 20260823000200_trusted_replies.sql for why this is its own
 // table instead of verified_answers.
 //
@@ -16,7 +16,7 @@
 // stored (unique constraint + a pre-check), and safe to re-run to pick up
 // each person's newer replies later.
 //
-// Profile URLs are deployment-specific — set TRUSTED_AUTHOR_PROFILE_URLS as
+// Profile URLs are deployment-specific, set TRUSTED_AUTHOR_PROFILE_URLS as
 // a comma-separated env var (full profile URLs on your COMMUNITY_HOST).
 //
 // Run:
@@ -35,7 +35,7 @@ import { chatJSON, embed as geminiEmbed } from './lib/gemini'
 
 // console.log alone has been observed to vanish entirely (nothing in the
 // redirected file) when this script gets killed mid-run on a high-volume
-// profile — a stray progress file written synchronously, line by line,
+// profile, a stray progress file written synchronously, line by line,
 // survives that even when stdout doesn't.
 const PROGRESS_FILE = process.env.SCRAPE_PROGRESS_FILE || '/tmp/scrape-trusted-replies.progress.log'
 function log(msg: string): void {
@@ -89,7 +89,7 @@ async function resolveUserId(): Promise<string> {
 
 /** Converts one relative-date string ("11 days ago", "4 months ago") to an
  *  approximate day count. Used ONLY to decide when to stop clicking "Show
- *  more posts" — never to decide whether a reply is actually in range. The
+ *  more posts", never to decide whether a reply is actually in range. The
  *  real cutoff, checked per-thread below, is the fetched answer's own
  *  created_at from JSON-LD, which is exact. */
 function relativeAgeDays(relativeText: string): number {
@@ -118,7 +118,7 @@ const PAGINATION_TIME_BUDGET_MS = 180000
  *  canonical thread fetchThread() expects).
  *
  *  Everything is read in ONE page.evaluate() call per iteration (raw DOM,
- *  no per-element Playwright IPC round-trips) — with hundreds of
+ *  no per-element Playwright IPC round-trips), with hundreds of
  *  accumulated entries after many clicks, doing this element-by-element
  *  turned each iteration into hundreds of round-trips and made the whole
  *  loop unusably slow on a high-volume profile. */
@@ -155,7 +155,7 @@ async function collectActivityLinks(page: import('playwright').Page): Promise<st
     }
     if (maxAgeDays >= CUTOFF_DAYS) break
 
-    // Not a real <button> — the platform renders this as an <a class="btn--load-more">
+    // Not a real <button>, the platform renders this as an <a class="btn--load-more">
     // styled to look like one, with a click handler that AJAX-appends the
     // next page rather than navigating. getByRole('button', ...) never
     // matches it, so pagination silently never advanced past the first load.

@@ -9,7 +9,7 @@ import { embed } from '../_shared/ai-provider.ts'
 // reference docs and the forum text on every later extraction and synthesis.
 //
 // It writes to this project's own database only. It never sends the reply
-// anywhere — posting to the community is the operator's manual action.
+// anywhere, posting to the community is the operator's manual action.
 
 interface RequestBody {
   reply_text: string
@@ -17,15 +17,15 @@ interface RequestBody {
   answer_html?: string | null
   question_summary: string
   watch_id?: string | null
-  /** community_patterns rows this reply answers — a reply can cover several cases (verified_answer_cases join table). The first id in the list fills in watch_id/source_url whenever those weren't given separately, same precedence the single pattern_id field used to have. Undefined leaves existing links untouched (an edit that doesn't mention linking shouldn't wipe it); [] explicitly clears all links. */
+  /** community_patterns rows this reply answers, a reply can cover several cases (verified_answer_cases join table). The first id in the list fills in watch_id/source_url whenever those weren't given separately, same precedence the single pattern_id field used to have. Undefined leaves existing links untouched (an edit that doesn't mention linking shouldn't wipe it); [] explicitly clears all links. */
   pattern_ids?: string[]
   category?: string | null
   subcategory?: string | null
   source_note?: string | null
   source_url?: string | null
-  /** Whether this grounds/gets cited in future drafts. Defaults true — off makes it a plain record (mirrors verified_answers.verified's DB default). Every call site reaching this function is itself a human action (a click, or the manual-entry form), so a human-saved row is verified by definition; stage-ai-drafts writes its own unverified rows directly, bypassing this function. */
+  /** Whether this grounds/gets cited in future drafts. Defaults true, off makes it a plain record (mirrors verified_answers.verified's DB default). Every call site reaching this function is itself a human action (a click, or the manual-entry form), so a human-saved row is verified by definition; stage-ai-drafts writes its own unverified rows directly, bypassing this function. */
   verified?: boolean
-  /** Which path wrote this row. Defaults 'manual' — every caller of this function is a human action. */
+  /** Which path wrote this row. Defaults 'manual', every caller of this function is a human action. */
   source?: 'manual' | 'ai_draft'
   /** When set, re-embeds and updates this existing row instead of inserting a new one. */
   id?: string
@@ -89,7 +89,7 @@ serve(async (req) => {
     // ── Resolve the referenced rows, and drop any that are not the caller's.
     // The FK is ON DELETE SET NULL, so a null here is a valid row, not an
     // error. community_clusters itself is retired (fixed 9-topic/27-subtopic
-    // taxonomy replaces it — see lib/topic-taxonomy.ts) — subcategory falls
+    // taxonomy replaces it, see lib/topic-taxonomy.ts), subcategory falls
     // back to the linked pattern's fixed subtopic instead of cluster.label,
     // resolved below once pattern_ids are validated.
     let subcategory = trimmedOrNull(body.subcategory)
@@ -111,7 +111,7 @@ serve(async (req) => {
     }
 
     // Validate every requested pattern_id belongs to this user (dropping any
-    // that don't, rather than failing the whole save over one bad id) — same
+    // that don't, rather than failing the whole save over one bad id), same
     // trust-but-verify the single pattern_id field used to get. The first
     // valid one fills in watch_id/source_url whenever those weren't already
     // resolved above, same precedence category/subcategory has against
@@ -149,7 +149,7 @@ serve(async (req) => {
     // Embeds question_summary so draft-reply can retrieve this row by semantic
     // similarity (match_verified_answers RPC) instead of keyword overlap.
     // A failed embedding call must not block saving the verified answer
-    // itself — it just leaves embedding null, same as a pre-migration row,
+    // itself, it just leaves embedding null, same as a pre-migration row,
     // and gets picked up by the backfill script later.
     let embedding: number[] | null = null
     if (apiKey) {
@@ -181,7 +181,7 @@ serve(async (req) => {
       }
       if (body.watch_id !== undefined) patch.watch_id = watchId
       if (body.source_url !== undefined) patch.source_url = sourceUrl
-      // Editing text is still an edit, not a re-origination — only stamp
+      // Editing text is still an edit, not a re-origination, only stamp
       // `source` when the caller explicitly named one.
       if (body.source !== undefined) patch.source = source
 
@@ -219,7 +219,7 @@ serve(async (req) => {
     if (!saved) throw new Error('Save failed.')
     const savedId = saved.id
 
-    // Sync verified_answer_cases to the requested set — undefined (the
+    // Sync verified_answer_cases to the requested set, undefined (the
     // caller never mentioned linking, e.g. an in-place text-only edit)
     // leaves existing links alone; [] explicitly clears every link; a
     // non-empty list replaces the set (delete what's no longer there,

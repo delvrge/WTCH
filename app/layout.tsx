@@ -3,7 +3,7 @@ import { Source_Sans_3 } from 'next/font/google'
 import './globals.css'
 
 // A clean, neutral sans that reads well in a dense support-operator UI.
-// Genuinely free (SIL license) — Google's catalog lists it as "Source Sans 3".
+// Genuinely free (SIL license), Google's catalog lists it as "Source Sans 3".
 const sourceSans = Source_Sans_3({
   subsets: ['latin'],
   weight: ['400', '600', '700'],

@@ -2,23 +2,23 @@
 // system prompt.
 //
 // Authority order, never violated:
-//   1. Support docs      — official product documentation (SUPPORT_DOCS_HOST),
+//   1. Support docs     , official product documentation (SUPPORT_DOCS_HOST),
 //      passed in by the caller (see `opts.support` on loadGrounding). Not a
 //      database table; fetched live per request by _shared/support-docs.ts.
-//   2. Platform staff replies (Community Manager / Expert, <=12 months old) —
+//   2. Platform staff replies (Community Manager / Expert, <=12 months old) ,
 //      citable, ranked ABOVE the operator's own verified_answers. The
 //      operator is new to the subject matter and trusts CM/CE staff
 //      more than their own past replies, but only while the guidance is
-//      still current — see AUTHORITY_MAX_AGE_MONTHS in
+//      still current, see AUTHORITY_MAX_AGE_MONTHS in
 //      _shared/community-sources.ts. Passed in by the caller (see
 //      `opts.authority` on loadGrounding / the `authority` param on
 //      buildGroundingBundle). Not a database table.
-//   3. verified_answers  — a reply the user actually sent that actually
+//   3. verified_answers , a reply the user actually sent that actually
 //      worked. Ranked below staff replies deliberately (see above).
-//   4. context_docs       — system-maintained notes. Lower trust than the
+//   4. context_docs      , system-maintained notes. Lower trust than the
 //      three sources above; the model may write these, the user never
 //      authors them by hand.
-//   5. Forum thread text — signal only. It says what people are ASKING or
+//   5. Forum thread text, signal only. It says what people are ASKING or
 //      COMPLAINING about; it is never a statement of fact about how the
 //      product works, and is never stored in any of the tables above.
 
@@ -41,7 +41,7 @@ export interface ReplyGrounding {
   excerpt: string | null // verbatim quote from the cited source, or null
 }
 
-/** Rows as loaded — carries the header fields the bundle shape omits. */
+/** Rows as loaded, carries the header fields the bundle shape omits. */
 interface VerifiedAnswerRow {
   id: string
   category: string | null
@@ -63,7 +63,7 @@ export interface VerifiedAnswerInput {
 export interface SupportDocInput {
   url: string
   title: string
-  /** Shown in the rendered block — keep this short (a passage, not a whole page). */
+  /** Shown in the rendered block, keep this short (a passage, not a whole page). */
   excerpt: string
   /** The full source page text, used ONLY for citation verification, never rendered. */
   pageText: string
@@ -75,7 +75,7 @@ export interface SupportDocInput {
  * (see _shared/community-sources.ts) over their fetched threads.
  *
  * Several replies can share one thread `url`, so this alone is not a unique
- * citation ref — see `authorityRef()` below for the id actually used in
+ * citation ref, see `authorityRef()` below for the id actually used in
  * `[CM:...]` markers.
  */
 export interface CommunityAuthorityInput {
@@ -83,7 +83,7 @@ export interface CommunityAuthorityInput {
   author: string | null
   badge: string | null
   createdAt: string | null
-  /** Shown in the rendered block — keep this short (a passage, not the whole reply). */
+  /** Shown in the rendered block, keep this short (a passage, not the whole reply). */
   excerpt: string
   /** The full reply text, used ONLY for citation verification, never rendered. */
   fullText: string
@@ -108,13 +108,13 @@ const DEFAULT_MAX_CHARS = 24000
 const VERIFIED_CAP = 40
 
 const VERIFIED_HEADER =
-  '=== YOUR PAST VERIFIED ANSWERS (confirmed correct in real use — lower authority than platform staff replies above) ==='
+  '=== YOUR PAST VERIFIED ANSWERS (confirmed correct in real use, lower authority than platform staff replies above) ==='
 
 const SUPPORT_HEADER =
-  '=== SUPPORT DOCS (official product documentation — highest authority; wins on direct conflict) ==='
+  '=== SUPPORT DOCS (official product documentation, highest authority; wins on direct conflict) ==='
 
 const AUTHORITY_HEADER =
-  '=== PLATFORM STAFF REPLIES (Community Manager / Expert, within last 12 months) — citable, ranked above your own past replies. Authoritative but not official documentation; a Support doc wins on direct conflict. ==='
+  '=== PLATFORM STAFF REPLIES (Community Manager / Expert, within last 12 months), citable, ranked above your own past replies. Authoritative but not official documentation; a Support doc wins on direct conflict. ==='
 
 const NOTES_HEADER =
   '=== NOTES (system-maintained, lower authority than the sections above) ==='
@@ -128,14 +128,14 @@ the product works, and must never be repeated as fact. Only the sections above
 may be cited as fact.`
 
 const NO_GROUNDING_LINE =
-  '=== NO GROUNDING AVAILABLE — every suggested reply must be marked ungrounded. ==='
+  '=== NO GROUNDING AVAILABLE, every suggested reply must be marked ungrounded. ==='
 
 // ── block rendering ───────────────────────────────────────────────────────
 
 /**
  * Renders the grounding block. An empty section is omitted entirely; if every
  * section is empty the block is the single NO GROUNDING line (and no
- * trailer — there is nothing above the line to cite).
+ * trailer, there is nothing above the line to cite).
  */
 function renderBlock(
   support: SupportDocInput[],
@@ -155,7 +155,7 @@ function renderBlock(
 
   if (authority.length) {
     const entries = authority.map((a) => {
-      const who = [a.badge, a.author].filter(Boolean).join(' — ') || 'platform staff'
+      const who = [a.badge, a.author].filter(Boolean).join(', ') || 'platform staff'
       return `[CM:${a.ref}] ${who}\n${a.excerpt}`
     })
     sections.push(`${AUTHORITY_HEADER}\n${entries.join('\n\n')}`)
@@ -189,14 +189,14 @@ function renderBlock(
 // ── loading ───────────────────────────────────────────────────────────────
 
 /**
- * Builds a grounding bundle from already-resolved rows — no database access.
+ * Builds a grounding bundle from already-resolved rows, no database access.
  * `loadGrounding` below is a DB-backed convenience wrapper around this for
  * the common case (verified_answers + context_docs owned by one user); this
  * is exported directly for callers (draft-reply) that already ran their own
  * tracker search, fetched support docs, and/or collected citable staff
  * replies and just need the block assembled and truncated consistently.
  *
- * Truncation never drops support docs — they are the highest authority and
+ * Truncation never drops support docs, they are the highest authority and
  * outrank fitting inside the budget. Lower-authority sections are dropped
  * first, in this order: notes entirely, then verified answers, then platform
  * staff replies. This mirrors the authority order at the top of this file
@@ -217,7 +217,7 @@ export function buildGroundingBundle(
     answer_text: va.answer_text,
   }))
 
-  // Unique-per-reply ref assigned once, up front, over the FULL input list —
+  // Unique-per-reply ref assigned once, up front, over the FULL input list ,
   // so a ref a caller stashed alongside a reply (e.g. to correlate with its
   // own UI state) stays stable even if truncation later drops that entry
   // from the rendered block.
@@ -244,7 +244,7 @@ export function buildGroundingBundle(
 
   return {
     block,
-    // Only what actually survived into the block — a citation may never
+    // Only what actually survived into the block, a citation may never
     // resolve against a source the model was not shown.
     verified: verifiedRowsTrunc.map((row) => ({
       id: row.id,
@@ -265,15 +265,15 @@ export function buildGroundingBundle(
  * - `verified_answers` ordered by `verified_at DESC`, capped at 40. When
  *   `watchId` is given, that watch's rows come first, then the rest. Pass
  *   `opts.verified` instead to use an already-resolved tracker search
- *   (e.g. one scored against the current request's keywords) — when given,
+ *   (e.g. one scored against the current request's keywords), when given,
  *   the database read for verified_answers is skipped entirely.
  * - `opts.support`, when given, is a pre-fetched set of SUPPORT_DOCS_HOST
  *   passages (see _shared/support-docs.ts) to render as the SUPPORT DOCS
  *   section. There is no database table for this source.
  * - `opts.authority`, when given, is a pre-fetched set of citable platform
- *   staff (Community Manager / Expert) forum replies — see
+ *   staff (Community Manager / Expert) forum replies, see
  *   `citableAuthorityAnswers()` in _shared/community-sources.ts, which
- *   already filters to `is_staff === true` and within the last 12 months —
+ *   already filters to `is_staff === true` and within the last 12 months ,
  *   rendered as the PLATFORM STAFF REPLIES section, ranked above verified
  *   answers and below support docs. There is no database table for this
  *   source either.
@@ -314,8 +314,8 @@ export async function loadGrounding(
       supabaseAdmin
         .from('verified_answers')
         .select('id, watch_id, category, subcategory, question_summary, answer_text')
-        // Unverified — a personal record someone hasn't confirmed, or an
-        // AI-authored draft nobody has reviewed yet — must never ground or
+        // Unverified, a personal record someone hasn't confirmed, or an
+        // AI-authored draft nobody has reviewed yet, must never ground or
         // be cited in a future draft.
         .eq('verified', true)
         .order('verified_at', { ascending: false })

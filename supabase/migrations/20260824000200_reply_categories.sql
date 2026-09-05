@@ -1,10 +1,10 @@
--- A category can now be created ahead of any reply that uses it — the
+-- A category can now be created ahead of any reply that uses it, the
 -- "Add category" button on Replies, next to "Add reply". Without a table of
 -- its own, an empty category had nowhere to live: verified_answers.category
 -- is free text (20260824000100_subcategory_free_text.sql already dropped
 -- the fixed taxonomy there) and every category the app knew about was
 -- derived live off rows that already had one. This table is purely that
--- registry — a name exists here the moment it's created, whether or not any
+-- registry, a name exists here the moment it's created, whether or not any
 -- reply has picked it yet. Deleting a category is not implemented yet: no
 -- DELETE policy, on purpose.
 CREATE TABLE public.reply_categories (

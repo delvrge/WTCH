@@ -22,12 +22,12 @@ interface SubtopicGroup {
 }
 
 // Buckets this topic's raw patterns the exact same way Categories' counts
-// and ClusterGraph do (see classifyLeaf) — a pattern whose stored topic
+// and ClusterGraph do (see classifyLeaf), a pattern whose stored topic
 // matches but whose subtopic doesn't actually belong to it snapped to
 // Undefined there, so it has to snap the same way here or this page's
 // pattern list wouldn't reconcile with the count shown on the box that
 // linked to it. Every subtopic the taxonomy defines for this topic always
-// gets a group, even at zero patterns — same "show the whole fixed shape,
+// gets a group, even at zero patterns, same "show the whole fixed shape,
 // not just what's populated" rule Categories itself follows for topics.
 function buildSubtopicGroups(patterns: PatternRow[], topic: string, definedSubtopics: string[]): SubtopicGroup[] {
   const bySubtopic = new Map<string, PatternRow[]>(definedSubtopics.map((s) => [s, []]))
@@ -113,7 +113,7 @@ export default function TopicDetailPage() {
       {isKnownTopic && !error && !loading ? (
         <div className="stack-lg">
           <p className="meta">
-            {totalPatterns} {totalPatterns === 1 ? 'pattern' : 'patterns'}, {totalMentions} total {totalMentions === 1 ? 'mention' : 'mentions'} across {groups.length} {groups.length === 1 ? 'subtopic' : 'subtopics'} — ranked by how often each recurs, so the most-complained-about issue leads.
+            {totalPatterns} {totalPatterns === 1 ? 'pattern' : 'patterns'}, {totalMentions} total {totalMentions === 1 ? 'mention' : 'mentions'} across {groups.length} {groups.length === 1 ? 'subtopic' : 'subtopics'}, ranked by how often each recurs, so the most-complained-about issue leads.
           </p>
 
           {groups.map((group) => (

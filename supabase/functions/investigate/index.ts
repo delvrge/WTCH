@@ -1,18 +1,18 @@
 // HTTP wrapper for the investigation walkthrough. Auth, the single-user
-// gate, and request/response shape only — the feature itself lives in
+// gate, and request/response shape only, the feature itself lives in
 // _shared/investigation.ts so it can also be run from
 // scripts/preview-investigation.ts without a browser session.
 //
-// buildInvestigation() itself stays read-only — it never touches the
+// buildInvestigation() itself stays read-only, it never touches the
 // database. This wrapper does two best-effort writes on top of it, neither
 // of which may ever fail the response the operator is waiting on:
 //
 // 1. Auto-collect: the pasted case goes into the Library (community_patterns)
 //    automatically, same extract+embed+dedup path as a manual Collect click
-//    or run-watch. CORE BEHAVIOR — do not remove. When a link was pasted and
+//    or run-watch. CORE BEHAVIOR, do not remove. When a link was pasted and
 //    the thread fetched, that exact thread is collected (source_url set).
 //    Otherwise (a bare title/description, or the fetch failed) the pasted
-//    text itself is collected instead, with no source_url — flagged for the
+//    text itself is collected instead, with no source_url, flagged for the
 //    operator to paste the real link in by hand later, but never dropped.
 // 2. investigation_log: one row for the /coverage gap view (see migration
 //    20260822000100).
@@ -67,7 +67,7 @@ serve(async (req) => {
     const text = typeof body.text === 'string' ? body.text.trim() : ''
     if (!text) throw new Error('text is required')
     // Library's "Rerun" re-investigates a case already sitting in
-    // community_patterns — auto-collect must not touch it again (bumping
+    // community_patterns, auto-collect must not touch it again (bumping
     // its frequency, re-extracting its fields) just because the operator
     // wanted a fresh walkthrough. The caller already knows the row's id.
     const skipAutoCollect = body.skip_auto_collect === true
@@ -87,13 +87,13 @@ serve(async (req) => {
     let autoCollected: { url: string | null; pattern_id: string; action: 'inserted' | 'updated' | 'skipped' } | null = null
     const collectErrors: string[] = []
     if (skipAutoCollect) {
-      // A rerun on a case that's already tracked — the id is already
+      // A rerun on a case that's already tracked, the id is already
       // known, so this stands in for the real collect without writing
       // anything, letting Tags still work off a real pattern_id.
       if (knownPatternId) autoCollected = { url: result.source?.url ?? null, pattern_id: knownPatternId, action: 'skipped' }
     } else try {
       // Same vocabulary lookup extract-pattern/draft-reply used to run before
-      // extraction — existing surface labels for this (watchless) corpus, so
+      // extraction, existing surface labels for this (watchless) corpus, so
       // the model reuses "video generation" instead of inventing "video gen".
       const { data: vocabRows, error: vocabError } = await supabaseAdmin
         .from('community_patterns')

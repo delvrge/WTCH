@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 
-// Cmd+K on Mac, Ctrl+K on Windows/Linux — same binding, browsers report it
+// Cmd+K on Mac, Ctrl+K on Windows/Linux, same binding, browsers report it
 // as metaKey vs ctrlKey depending on platform. `onTrigger` fires only for the
 // shortcut, not for an ordinary click-to-focus, so callers can tell the two
 // apart (e.g. only shortcut-triggered focus should dim the rest of the page).

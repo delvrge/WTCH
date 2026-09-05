@@ -26,7 +26,7 @@ export async function callWatchFn<T>(name: string, body: unknown): Promise<T> {
       body: JSON.stringify(body),
     })
   } catch {
-    throw new Error('Network error — could not reach the server.')
+    throw new Error('Network error, could not reach the server.')
   }
 
   let payload: unknown

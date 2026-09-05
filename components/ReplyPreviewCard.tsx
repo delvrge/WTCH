@@ -17,7 +17,7 @@ const REPLY_STATUS_LABEL: Record<CaseRow['replyStatus'], string> = {
  * (rather than a hard cut) when it overflows the box.
  *
  * Default click still goes to /replies (edit/copy the reply, unchanged
- * behavior) — a case with an unread new reply additionally shows a small
+ * behavior), a case with an unread new reply additionally shows a small
  * "View conversation" action that opens the chat-bubble popup instead.
  */
 export default function ReplyPreviewCard({
@@ -27,14 +27,14 @@ export default function ReplyPreviewCard({
   onOpenConversation,
 }: {
   row: CaseRow
-  /** The linked reply's answer_text, when known — undefined when replyStatus is 'none' or the text hasn't loaded. */
+  /** The linked reply's answer_text, when known, undefined when replyStatus is 'none' or the text hasn't loaded. */
   previewText?: string
   onView: (row: CaseRow) => void
   onOpenConversation: (row: CaseRow) => void
 }) {
   const unread = Boolean(row.unreadSince)
 
-  // No reply on record yet — the plain chip, same as it always was. No
+  // No reply on record yet, the plain chip, same as it always was. No
   // reserved height here: forcing one just to match a populated row made
   // rows LESS even (a short reply forced its row artificially tall next to
   // a longer title with no reply). Letting each row size to its own actual
@@ -70,7 +70,7 @@ export default function ReplyPreviewCard({
         <button
           type="button"
           className="reply-preview-card-unread-btn"
-          title="New reply — view the conversation"
+          title="New reply, view the conversation"
           onClick={() => onOpenConversation(row)}
         >
           New reply · View conversation

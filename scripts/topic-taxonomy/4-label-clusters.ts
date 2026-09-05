@@ -121,7 +121,7 @@ async function main() {
     if (updateError) throw updateError
 
     const examples = sample(posts, Math.min(EXAMPLES_IN_REPORT, posts.length))
-    reportSections.push(`## Cluster ${clusterId}: ${topic} — ${subtopic}`)
+    reportSections.push(`## Cluster ${clusterId}: ${topic}, ${subtopic}`)
     reportSections.push(`${posts.length} posts\n`)
     for (const ex of examples) {
       reportSections.push(`- [${ex.title}](${ex.url})`)

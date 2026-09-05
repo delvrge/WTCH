@@ -14,7 +14,7 @@
 -- schema is RLS-scoped to auth.uid() = user_id because the anon key ships
 -- to the browser and needs a policy to open under; this table has no owning
 -- user to scope to, so RLS stays enabled per house convention but
--- deliberately carries NO policies — the anon key gets zero rows here,
+-- deliberately carries NO policies, the anon key gets zero rows here,
 -- which is the safe default for a table only edge functions should ever
 -- touch.
 
@@ -40,7 +40,7 @@ CREATE INDEX support_docs_search_vector_idx
   ON public.support_docs USING GIN (search_vector);
 
 ALTER TABLE public.support_docs ENABLE ROW LEVEL SECURITY;
--- Intentionally no policies — see header comment. Only a service-role
+-- Intentionally no policies, see header comment. Only a service-role
 -- client (crawl-support-docs, searchSupportDocs) reads or writes this
 -- table; both bypass RLS entirely, so no policy is needed for them to
 -- work, and none is added for anon/authenticated roles.

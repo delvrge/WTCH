@@ -3,7 +3,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { getCorsHeaders } from '../_shared/cors.ts'
 import { fetchThread } from '../_shared/community-sources.ts'
 
-// The bell's poller. Called from the browser (Bell.tsx), not a cron — the
+// The bell's poller. Called from the browser (Bell.tsx), not a cron, the
 // operator's own login session drives it, same auth path as every other
 // button in the app, so it never depends on the Vault service-role secret
 // the crawl-support-docs cron has been stuck on.
@@ -12,12 +12,12 @@ import { fetchThread } from '../_shared/community-sources.ts'
 // with a resolvable thread link, re-fetches the thread and compares its
 // non-staff answer count to the count last seen (case_status.last_reply_count).
 // A rising count means someone (the original poster, not platform staff) replied
-// since the last check — this alone flips status to 'user_replied', no manual
+// since the last check, this alone flips status to 'user_replied', no manual
 // "CM replied" step required first. Sending your own reply happens by hand,
 // outside this app, so there's no reliable signal to gate on besides the OP's
 // own reply landing.
 //
-// Read-only toward the platform, same as every other fetch in this app — this only
+// Read-only toward the platform, same as every other fetch in this app, this only
 // ever GETs a thread page, never posts.
 
 const DEFAULT_LIMIT = 60
@@ -81,7 +81,7 @@ serve(async (req) => {
       const body = await req.json()
       if (typeof body?.limit === 'number' && body.limit > 0) limit = Math.floor(body.limit)
     } catch {
-      // No body / not JSON — use the default limit.
+      // No body / not JSON, use the default limit.
     }
 
     // ── Load the tracked, still-open cases worth polling ────────────────────
@@ -160,7 +160,7 @@ serve(async (req) => {
             .eq('case_id', c.case_id)
           if (updateError) throw updateError
         } else if (replyCount !== c.last_reply_count) {
-          // Count dropped (e.g. a reply was deleted upstream) — resync the
+          // Count dropped (e.g. a reply was deleted upstream), resync the
           // baseline without touching unread_since/status.
           const { error: updateError } = await supabaseAdmin
             .from('case_status')

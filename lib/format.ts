@@ -18,7 +18,7 @@ export function relativeTime(value: string | number | null | undefined): string 
 }
 
 /** ISO calendar date, so a source date is never ambiguous. Used for sorting
- * and filenames (e.g. the Library CSV export) — for on-screen display, use
+ * and filenames (e.g. the Library CSV export), for on-screen display, use
  * usDate below instead. */
 export function isoDate(value: string | null | undefined): string | null {
   if (!value) return null
@@ -45,7 +45,7 @@ export function sourceDateLabel(value: string | null | undefined): string | null
 // Board slug -> label, derived from a topic URL path segment. There is no DB
 // column for this; it is computed at render time.
 //
-// The platform suffixes the board slug with a numeric id that varies by locale —
+// The platform suffixes the board slug with a numeric id that varies by locale ,
 // the English boards are bug-reports-403/feature-requests-405/questions-404,
 // but a German or Portuguese post can sit on bug-reports-<other-id> etc.
 // Matching on the base name (suffix stripped) rather than the full slug
@@ -79,7 +79,7 @@ export function boardLabelFromSlug(slug: string | null | undefined): string | nu
   return BOARD_BASE_LABELS[boardBaseName(slug)] || slug
 }
 
-/** Canonical board key ('bug-reports' | 'feature-requests' | 'questions'), or null when the slug doesn't match one of the three — used for filtering, independent of locale/display label. */
+/** Canonical board key ('bug-reports' | 'feature-requests' | 'questions'), or null when the slug doesn't match one of the three, used for filtering, independent of locale/display label. */
 export function boardCategoryFromSlug(slug: string | null | undefined): string | null {
   if (!slug) return null
   const base = boardBaseName(slug)
@@ -92,7 +92,7 @@ export function boardCategoryFromUrl(sourceUrl: string | null | undefined): stri
 
 // CSS class carrying each board's color (see .chip-bug / .chip-question /
 // .chip-feature in globals.css). Unrecognized boards keep the default
-// neutral chip styling — null means "no color override".
+// neutral chip styling, null means "no color override".
 const BOARD_BASE_CHIP_CLASSES: Record<string, string> = {
   'bug-reports': 'chip-bug',
   'feature-requests': 'chip-feature',
@@ -104,8 +104,8 @@ export function boardChipClass(slug: string | null | undefined): string | null {
   return BOARD_BASE_CHIP_CLASSES[boardBaseName(slug)] || null
 }
 
-// Discovered topics carry no title — fetching every thread just to read one
-// would defeat the point of a lightweight discovery call — so derive a
+// Discovered topics carry no title, fetching every thread just to read one
+// would defeat the point of a lightweight discovery call, so derive a
 // readable label from the URL slug: last path segment, trailing "-<id>"
 // stripped, hyphens to spaces, first letter capitalised. This is a guess at
 // the title, not the real thing.
@@ -137,7 +137,7 @@ function escapeRegExp(value: string): string {
 }
 
 /**
- * Splits `text` into segments, marking which ones matched a search keyword —
+ * Splits `text` into segments, marking which ones matched a search keyword ,
  * so a caller can highlight the reason a passage was picked without needing
  * a highlighting library. Longer keywords are tried first so a multi-word
  * phrase highlights as one span instead of fragmenting into its own words.

@@ -10,7 +10,7 @@ import { discoverTopics, fetchThread } from '../_shared/community-sources.ts'
 // Auth shape: Bearer token -> auth.getUser(). A separate service-role
 // client is used for DB work.
 //
-// Makes no Gemini call — this is a thin wrapper over the source helpers.
+// Makes no Gemini call, this is a thin wrapper over the source helpers.
 
 interface DiscoverRequestBody {
   mode: 'discover'

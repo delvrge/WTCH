@@ -1,10 +1,10 @@
-// Retrieval against community_patterns — the Library of past cases.
+// Retrieval against community_patterns, the Library of past cases.
 //
 // Distinct from the near-duplicate check inside saveExtractedPattern: that
 // one asks "is this the SAME case, should the rows merge" and runs strict
 // (0.85 + an exact `surface` agreement gate). This one asks "which past
 // cases are RELATED enough to be worth showing the operator", so it runs
-// looser and never gates on surface — a related case with a different
+// looser and never gates on surface, a related case with a different
 // surface is still useful context, it just must not silently merge.
 //
 // Call it with an embedding produced by normalizeAndEmbed (normalize-issue.ts).
@@ -14,7 +14,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 /**
- * Retrieval default. Deliberately below the 0.85 merge bar — see above.
+ * Retrieval default. Deliberately below the 0.85 merge bar, see above.
  *
  * Measured with scripts/compare-matching.ts: querying each stored case by
  * its own real post title, every case retrieved itself in the 0.62-0.95 band
@@ -33,7 +33,7 @@ export interface PatternHit {
   frequency: number
   last_seen: string | null
   similarity: number
-  /** Enrichment columns — the RPC does not return these. */
+  /** Enrichment columns, the RPC does not return these. */
   surface: string | null
   topic: string | null
   subtopic: string | null
@@ -65,7 +65,7 @@ interface EnrichRow {
 
 /**
  * Semantic search over the user's community_patterns, newest-strongest
- * first. Returns [] rather than throwing when the enrichment select fails —
+ * first. Returns [] rather than throwing when the enrichment select fails ,
  * a hit with missing metadata is still a usable hit, so only the RPC itself
  * is treated as fatal.
  */
@@ -87,7 +87,7 @@ export async function searchPatterns(
   const rows = (data ?? []) as RpcRow[]
   if (!rows.length) return []
 
-  // The RPC's RETURNS TABLE omits surface/topic/subtopic/source_* — fetch
+  // The RPC's RETURNS TABLE omits surface/topic/subtopic/source_*, fetch
   // them in one round trip rather than widening the function signature,
   // which would mean a migration for a read-only convenience.
   const byId = new Map<string, EnrichRow>()

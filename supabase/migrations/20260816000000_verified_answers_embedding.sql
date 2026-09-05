@@ -9,7 +9,7 @@ CREATE INDEX verified_answers_embedding_hnsw_idx
   ON public.verified_answers USING hnsw (embedding extensions.vector_cosine_ops);
 
 -- ── Similarity search RPC ────────────────────────────────────────────────
--- SECURITY INVOKER (not DEFINER) so RLS still applies — this runs as the
+-- SECURITY INVOKER (not DEFINER) so RLS still applies, this runs as the
 -- requesting user, mirroring match_community_patterns.
 
 CREATE OR REPLACE FUNCTION public.match_verified_answers(

@@ -25,11 +25,11 @@ export default function CaseTable({
   onUrlChange: (row: CaseRow, url: string | null) => void
   onTitleChange: (row: CaseRow, title: string | null) => void
   onRemove: (row: CaseRow) => void
-  /** Clears the bell's unread flag — called when the operator actually looks at the case (opens the thread link or its reply). */
+  /** Clears the bell's unread flag, called when the operator actually looks at the case (opens the thread link or its reply). */
   onView: (row: CaseRow) => void
   /** Opens the chat-bubble conversation popup for a case with a new unread reply. */
   onOpenConversation: (row: CaseRow) => void
-  /** Case id to scroll to and flash — set when arriving via the bell's "New replies" deep link. */
+  /** Case id to scroll to and flash, set when arriving via the bell's "New replies" deep link. */
   highlightId?: string | null
 }) {
   const [editingUrlId, setEditingUrlId] = useState<string | null>(null)
@@ -90,14 +90,14 @@ export default function CaseTable({
                   row.unreadSince
                     ? 'New reply since you last looked'
                     : isInactiveAwaiting(row)
-                      ? 'Inactive — awaiting reply, no response in over a week'
+                      ? 'Inactive, awaiting reply, no response in over a week'
                       : CASE_STATUS_OPTIONS.find(o => o.value === row.status)?.label || row.status
                 }
               />
               <span className="case-card-num">#{row.caseNumber}</span>
               {board ? <span className={`chip${boardClass ? ` ${boardClass}` : ''}`}>{board}</span> : null}
               {row.subtopic ? (
-                <span className="chip case-topic-chip" title={row.topic ? `${row.topic} — ${row.subtopic}` : row.subtopic}>
+                <span className="chip case-topic-chip" title={row.topic ? `${row.topic}, ${row.subtopic}` : row.subtopic}>
                   {row.subtopic}
                 </span>
               ) : null}
@@ -108,7 +108,7 @@ export default function CaseTable({
                     row.source === 'pattern' ? `&pattern_id=${encodeURIComponent(row.id.slice('pattern:'.length))}` : ''
                   }`}
                   className="btn quiet"
-                  title="Re-run Investigate on this case — recommended cases, approach, tags — without re-adding it to the Library"
+                  title="Re-run Investigate on this case, recommended cases, approach, tags, without re-adding it to the Library"
                   onClick={() => onView(row)}
                 >
                   Rerun
@@ -116,7 +116,7 @@ export default function CaseTable({
                 <button
                   type="button"
                   className="btn quiet"
-                  title="Not my case — remove it from the tracker"
+                  title="Not my case, remove it from the tracker"
                   onClick={() => setPendingRemove(row)}
                 >
                   Remove
@@ -247,7 +247,7 @@ export default function CaseTable({
         <Modal onClose={() => setPendingRemove(null)}>
           <h2>Remove case?</h2>
           <p className="meta">
-            Permanently deletes "{pendingRemove.title}" — the underlying record, not just this view. Cannot
+            Permanently deletes "{pendingRemove.title}", the underlying record, not just this view. Cannot
             be undone.
           </p>
           <div className="modal-foot">

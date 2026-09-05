@@ -1,4 +1,4 @@
-// Investigation walkthrough — an INTERNAL guide for the operator, not a
+// Investigation walkthrough, an INTERNAL guide for the operator, not a
 // customer-facing reply.
 //
 // The whole feature lives here rather than in the edge function so it can be
@@ -46,7 +46,7 @@ const PATTERN_RESULT_LIMIT = 6
 const VERIFIED_RESULT_LIMIT = 4
 const TRUSTED_RESULT_LIMIT = 4
 const SUPPORT_RESULT_LIMIT = 3
-// Same floor as draft-reply's tracker search, measured the same way — see
+// Same floor as draft-reply's tracker search, measured the same way, see
 // TRACKER_MIN_SIMILARITY in draft-reply/index.ts.
 const VERIFIED_MIN_SIMILARITY = 0.6
 const TRUSTED_MIN_SIMILARITY = 0.6
@@ -62,7 +62,7 @@ export interface VerifiedHit {
 /** A real reply from a trusted Community Manager/Expert (see
  *  TRUSTED_AUTHORS), backfilled ahead of time rather than found live via
  *  the solved-threads search. Not the operator's own reply, so kept out of
- *  verified_answers — see the migration's header comment. */
+ *  verified_answers, see the migration's header comment. */
 export interface TrustedHit {
   id: string
   question_summary: string
@@ -121,7 +121,7 @@ export interface InvestigateResult {
   source: { url: string; title: string } | null
   /** The full fetched thread behind `source`, when there is one. Exposed so
    *  investigate/index.ts can auto-collect it into the Library without a
-   *  second fetch — buildInvestigation itself stays read-only (no DB
+   *  second fetch, buildInvestigation itself stays read-only (no DB
    *  writes), so scripts/preview-investigation.ts keeps costing nothing but
    *  model calls for prompt tuning. */
   thread: ThreadContent | null
@@ -138,7 +138,7 @@ export interface Investigation {
   one_liner: string
   confidence: 'high' | 'medium' | 'low'
   steps: Step[]
-  /** Empty for `closeable` cases by construction — nothing to ask. */
+  /** Empty for `closeable` cases by construction, nothing to ask. */
   questions_to_ask: Question[]
   watch_out: string[]
 }
@@ -282,7 +282,7 @@ ${trustedLines}
 SOLVED THREADS on the community that describe a similar problem and already have an answer on them:
 ${solvedLines}
 
-OFFICIAL SUPPORT DOCUMENTATION — highest authority, wins on direct conflict with any tier above:
+OFFICIAL SUPPORT DOCUMENTATION, highest authority, wins on direct conflict with any tier above:
 ${supportLines}`
 
   return { block, labels }
@@ -307,7 +307,7 @@ Rules for the fields:
 - confidence: "high" only when a cited entry clearly covers this same underlying problem. "low" when the evidence is thin or unrelated, and say why in watch_out.
 
 About the SOLVED THREADS tier: the incoming post is usually NOT yet answered, so this tier is where an actual fix is most likely to be found. Prefer it when it is relevant. Respect the stated strength of each one: an entry marked as the correct answer can be presented as what resolved the issue, while a staff reply that was never marked as the solution may have been the staff member asking for more detail rather than solving anything, so read the answer text before treating it as a fix. A solved thread about a DIFFERENT problem must be ignored outright, never stretched to fit.
-- steps: 2 to 6 concrete actions, in the order the operator should do them. Each step is one action, phrased as an instruction ("check whether the account is on the free plan", not "the operator could check"). When a step comes from a past case, a verified answer, a solved thread, or official documentation, set "cite" to that entry's label exactly as written above, for example "[C1]", "[V2]", "[T1]", "[S1]" or "[D1]". Use null only when the step is ordinary procedure that no listed entry established. A step that restates what a listed entry did and cites nothing is wrong: whenever the EVIDENCE block contains any entry, at least one step must cite one. Official documentation ([D1], [D2]...) outranks every other tier on direct conflict — if a support doc contradicts a past case or forum reply, follow the doc.
+- steps: 2 to 6 concrete actions, in the order the operator should do them. Each step is one action, phrased as an instruction ("check whether the account is on the free plan", not "the operator could check"). When a step comes from a past case, a verified answer, a solved thread, or official documentation, set "cite" to that entry's label exactly as written above, for example "[C1]", "[V2]", "[T1]", "[S1]" or "[D1]". Use null only when the step is ordinary procedure that no listed entry established. A step that restates what a listed entry did and cites nothing is wrong: whenever the EVIDENCE block contains any entry, at least one step must cite one. Official documentation ([D1], [D2]...) outranks every other tier on direct conflict, if a support doc contradicts a past case or forum reply, follow the doc.
 - questions_to_ask: for "needs_investigation" only, 0 to 5 entries. Each is a specific question for the customer plus why the answer matters to the diagnosis. No generic intake questions that would not change what the operator does next.
 - watch_out: 0 to 3 short warnings. Use it for thin or conflicting evidence, for a past case that is old enough that the issue may already be fixed, or for a wrong turn the evidence suggests. Omit rather than pad.
 - Never use an em dash (—) anywhere; use a period, comma, or "and" instead.
@@ -334,7 +334,7 @@ function verifyCites(steps: Step[], labels: Map<string, string>): Step[] {
   }).filter((step) => step.text.length > 0)
 }
 
-/** The whole walkthrough: retrieve, ground, write. Read-only — nothing here
+/** The whole walkthrough: retrieve, ground, write. Read-only, nothing here
  *  writes to the database. Throws only on an unusable model response; a
  *  failed retrieval degrades into an `errors` entry and thinner evidence. */
 export async function buildInvestigation(
@@ -344,7 +344,7 @@ export async function buildInvestigation(
   apiKey: string,
   opts: {
     /** The case's own community_patterns id, when known (a Library
-     *  "Rerun") — excluded from `similar` alongside the existing
+     *  "Rerun"), excluded from `similar` alongside the existing
      *  url-based check below, since a rerun often has no url to match on
      *  (the operator reran off the title) and would otherwise show the
      *  case matching itself. */
@@ -356,7 +356,7 @@ export async function buildInvestigation(
   // ── Resolve what we are actually searching on ───────────────────────────
   // A pasted link is worth far more than a pasted title: fetching it gives the
   // poster's full description instead of one line. The thread's own REPLIES
-  // are deliberately excluded — on the case being worked they are usually the
+  // are deliberately excluded, on the case being worked they are usually the
   // operator's own "please send a screenshot", which describes no problem and
   // would only blur the search.
   //
@@ -436,7 +436,7 @@ export async function buildInvestigation(
   // Showing the operator their own open case back as a "similar past case" is
   // noise at best and misleading at worst: it looks like corroboration when it
   // is the same thread reflected. Matched on url, since that is what
-  // auto-collect stores and a case can carry several — plus, when the caller
+  // auto-collect stores and a case can carry several, plus, when the caller
   // already knows the case's own pattern_id (a Library "Rerun", which often
   // has no url to match on since the operator reran off the title), matched
   // on that id directly.

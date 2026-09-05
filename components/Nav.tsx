@@ -6,7 +6,7 @@ import { supabaseClient } from '@/lib/supabase'
 import Bell from './Bell'
 import ThemeToggle from './ThemeToggle'
 
-// /watches is hidden from nav (not deleted) — the operator isn't using
+// /watches is hidden from nav (not deleted), the operator isn't using
 // it standalone; see the Watches+Gaps "knowledge gap" idea in the status
 // doc. The page and its data still work if linked to directly.
 const LINKS: { href: string; label: string }[] = [
@@ -31,7 +31,7 @@ export default function Nav() {
 
   return (
     <nav className="nav">
-      <span className="nav-logo" title="Watchtower — Community Manager copilot">
+      <span className="nav-logo" title="Watchtower, Community Manager copilot">
         Watchtower
       </span>
       <div className="nav-links">

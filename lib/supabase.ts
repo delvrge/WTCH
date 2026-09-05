@@ -4,7 +4,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 // Built lazily rather than at module scope: the pages are client components
 // that still get prerendered at build time, and createClient throws when the
-// env vars are absent. Nothing calls this during render — only effects and
+// env vars are absent. Nothing calls this during render, only effects and
 // event handlers do.
 let client: SupabaseClient | null = null
 
@@ -34,7 +34,7 @@ export function errorMessage(err: unknown, fallback: string): string {
 // PostgREST (PGRST301) rejects a request when the JWT's `iat` claim looks
 // like it's from the future relative to the server's own clock. This is a
 // transient clock-skew condition on Supabase's side, not something this app
-// causes or can fix directly — but a session refresh mints a fresh token
+// causes or can fix directly, but a session refresh mints a fresh token
 // with a new `iat`, which usually clears it on the next try.
 export function isJwtClockSkewError(err: unknown): boolean {
   const message = err instanceof Error ? err.message : typeof err === 'string' ? err : ''

@@ -1,6 +1,6 @@
-// Cases screen — a table the user hands to their manager: title, link to the
+// Cases screen, a table the user hands to their manager: title, link to the
 // post, tags (problem or complaint), status. Purely a tracker: no reply text
-// lives here — a genuine drafted or sent reply belongs on the Replies screen
+// lives here, a genuine drafted or sent reply belongs on the Replies screen
 // (verified_answers), keyed back to its case(s) via verified_answer_cases, a
 // many-to-many join table (one reply routinely answers several posts; a case
 // can pick up more than one reply over time). Built from two independent
@@ -12,15 +12,15 @@
 //     existed; tags -> tags.
 //   - verified_answers: an issue the user personally answered and confirmed
 //     worked. A reply with zero rows in verified_answer_cases (never linked
-//     to any case) still gets its own case row here — title falls back to
+//     to any case) still gets its own case row here, title falls back to
 //     question_summary, and to answer_text (the reply body) as the
 //     last-resort when even that is missing. A reply that IS linked to one
-//     or more cases only shows up under those — not also as a phantom case
+//     or more cases only shows up under those, not also as a phantom case
 //     of its own, which is what happened before this table existed.
 //
 // Link instability: the community platform renumbers/moves a post on merge, so
 // the stored URL can go stale. The numeric topic id embedded in the URL
-// (".../<slug>-<id>") is the stable identity — derived here, never stored
+// (".../<slug>-<id>") is the stable identity, derived here, never stored
 // server side, since this table's schema is out of scope for this screen.
 // A case is never dropped for a bad/missing link; it is flagged 'recheck'.
 
@@ -30,7 +30,7 @@ import type { Pattern, VerifiedAnswer, VerifiedAnswerCase } from './types'
 export type CaseSource = 'pattern' | 'verified'
 export type LinkStatus = 'ok' | 'recheck'
 
-// Manual only — set by hand from the Cases tab, never inferred. A reply
+// Manual only, set by hand from the Cases tab, never inferred. A reply
 // landing back on a thread after it's marked 'closed' can't reliably be told
 // apart from a plain "thanks" from a genuine reopen, so this stays a decision
 // the operator makes, not something the system guesses at.
@@ -55,32 +55,32 @@ export const CASE_STATUS_OPTIONS: { value: CaseStatus; label: string }[] = [
 export const DEFAULT_CASE_STATUS: CaseStatus = 'awaiting_reply'
 
 export interface CaseRow {
-  /** `pattern:<id>` or `verified:<id>` — stable across re-fetches. */
+  /** `pattern:<id>` or `verified:<id>`, stable across re-fetches. */
   id: string
   /**
    * Short sequential tracking number, 1..N, assigned oldest case first over
-   * the whole (unfiltered, unpaginated) case list — so a case keeps its
+   * the whole (unfiltered, unpaginated) case list, so a case keeps its
    * number as newer ones arrive, and filtering or paging never renumbers it.
-   * Display only: not stored server side, and not the post's identity — that
+   * Display only: not stored server side, and not the post's identity, that
    * is topicId.
    */
   caseNumber: number
   source: CaseSource
-  /** Effective title — the manual override when set, else the derived one. */
+  /** Effective title, the manual override when set, else the derived one. */
   title: string
   /** Derived title (pattern issue_summary / linked-pattern title / question_summary / answer_text fallback), ignoring any manual override. */
   derivedTitle: string
   /** Hand-entered override from the Cases table, or null when none is on record. */
   manualTitle: string | null
   tags: string[]
-  /** Fixed taxonomy (lib/topic-taxonomy.ts) off the source pattern directly —
+  /** Fixed taxonomy (lib/topic-taxonomy.ts) off the source pattern directly ,
    *  null for a 'verified'-source row (verified_answers carries no
    *  topic/subtopic of its own; see category/subcategory in tags instead)
    *  and for a pattern collected before the fixed taxonomy replaced the
    *  self-organizing cluster system. Not the same thing as topicId below. */
   topic: string | null
   subtopic: string | null
-  /** Effective URL for the post — the manual override when set, else the derived one. */
+  /** Effective URL for the post, the manual override when set, else the derived one. */
   url: string | null
   /** Derived URL (source_url / cluster-match fallback), ignoring any manual override. */
   derivedUrl: string | null
@@ -90,15 +90,15 @@ export interface CaseRow {
   topicId: string | null
   linkStatus: LinkStatus
   /** ISO date this case is numbered/sorted/displayed by (thread date or
-   *  verified date) — the post's own age, not when it was added here. */
+   *  verified date), the post's own age, not when it was added here. */
   caseDate: string | null
   /** ISO date the Time frame filter actually checks: when this row was last
-   *  touched (last_seen/verified_at, falling back to created_at) — when you
+   *  touched (last_seen/verified_at, falling back to created_at), when you
    *  started or last worked this case, not when the underlying post was
    *  made. A case pasted today about a months-old thread must still show up
    *  under "30 days"; filtering on caseDate (thread date) would hide it. */
   activityDate: string | null
-  /** The row's OWN created_at — when it was first added to the Library.
+  /** The row's OWN created_at, when it was first added to the Library.
    *  Never changes after insertion (unlike activityDate, bumped on every
    *  re-match) and unrelated to the underlying post's own age (unlike
    *  caseDate). This is what caseNumber is assigned from: it is the only one
@@ -107,9 +107,9 @@ export interface CaseRow {
    *  instead of landing in the middle and shifting everything after it. */
   addedAt: string | null
   status: CaseStatus
-  /** case_status.updated_at — last time status/url/title was touched for this case. */
+  /** case_status.updated_at, last time status/url/title was touched for this case. */
   statusUpdatedAt: string | null
-  /** case_status.unread_since — set by the bell's poller (check-case-replies)
+  /** case_status.unread_since, set by the bell's poller (check-case-replies)
    *  when a new reply lands on this case; null once viewed. Drives the
    *  orange unread indicator, independent of `status`. */
   unreadSince: string | null
@@ -117,15 +117,15 @@ export interface CaseRow {
   replyStatus: 'none' | 'unverified' | 'verified'
   /** The reply the chip deep-links to when there's more than one: a verified reply wins over a draft, ties broken oldest-first. Null when replyStatus is 'none'. */
   replyAnswerId: string | null
-  /** How many replies are linked to this case — 1 for a 'verified'-source row (it's always exactly itself), 0 or more for a 'pattern'-source row. Drives the "×N" badge next to the Reply chip when more than one. */
+  /** How many replies are linked to this case, 1 for a 'verified'-source row (it's always exactly itself), 0 or more for a 'pattern'-source row. Drives the "×N" badge next to the Reply chip when more than one. */
   replyCount: number
-  /** Who added this case — first part of their email, or "Matt" for cases
+  /** Who added this case, first part of their email, or "Matt" for cases
    *  from before shared access existed. */
   addedBy: string | null
 }
 
 // A case sits in 'awaiting_reply' with no update in this long is treated as
-// gone quiet — the user isn't coming back, but it's still "open" so it
+// gone quiet, the user isn't coming back, but it's still "open" so it
 // shouldn't silently rot with the same color as a fresh ask. Purely a
 // display computation: never stored, never changes actual status. Labelled
 // "Inactive" in the UI.
@@ -152,7 +152,7 @@ export const CASE_WINDOW_OPTIONS: { days: number; label: string }[] = [
 ]
 
 // A case with no known date can never be asserted to fall inside a window,
-// so it only ever appears under "All" — same rule the Library board uses.
+// so it only ever appears under "All", same rule the Library board uses.
 export function withinCaseWindow(date: string | null, days: number): boolean {
   if (days === 0) return true
   if (!date) return false
@@ -188,7 +188,7 @@ export function latestPatternUrl(p: Pattern): string | null {
 
 /** A case's linked replies reduced to what the chip needs: which one to
  * show/link to (verified beats draft; ties go to whichever is earlier in
- * the input list — callers pass replies oldest-first), the aggregate status,
+ * the input list, callers pass replies oldest-first), the aggregate status,
  * and the total count for the "×N" badge. */
 function summarizeReplies(
   replies: { id: string; verified: boolean }[] | undefined,
@@ -214,7 +214,7 @@ function patternToCase(
   const topicId = deriveTopicId(url)
   const tags = p.tags?.length ? p.tags : p.surface ? [p.surface] : []
   // The post's own title, exactly as it was written and in whatever language
-  // it was written in — that is what makes a row recognisable as the case
+  // it was written in, that is what makes a row recognisable as the case
   // being tracked. issue_summary is the model's generalized English
   // abstraction of it, kept only as the fallback for rows collected before
   // source_title existed.
@@ -262,7 +262,7 @@ function verifiedToCase(
   const derivedUrl = v.source_url || null
   const manualUrl = urlOverrideMap.get(id) ?? null
   const url = manualUrl || derivedUrl
-  // Title resolution — never the answer body when a real title is available:
+  // Title resolution, never the answer body when a real title is available:
   // 1) question_summary (a summary of the post, not the reply); 2) answer_text,
   // only when literally nothing else is on record.
   const derivedTitle = (v.question_summary?.trim() ? v.question_summary : null) || v.answer_text
@@ -297,10 +297,10 @@ function verifiedToCase(
 
 /**
  * Merge patterns and verified answers into one case list.
- * Rejected patterns (review_status: 'rejected') are excluded — they were
+ * Rejected patterns (review_status: 'rejected') are excluded, they were
  * marked by the user as not real issues, so they do not belong in a report
  * handed to a manager. Dismissed cases (case_status.dismissed) are excluded
- * the same way — not this CM's case to track, regardless of source.
+ * the same way, not this CM's case to track, regardless of source.
  */
 export function buildCases(
   patterns: Pattern[],
@@ -351,7 +351,7 @@ export function buildCases(
   const linkedAnswerIds = new Set<string>()
   for (const link of sortedLinks) {
     const answer = answersById.get(link.answer_id)
-    if (!answer) continue // stale read — the answer or the link since disappeared
+    if (!answer) continue // stale read, the answer or the link since disappeared
     linkedAnswerIds.add(answer.id)
     const entry = { id: answer.id, verified: answer.verified }
     const list = repliesByPatternId.get(link.pattern_id)
@@ -374,7 +374,7 @@ export function buildCases(
 
   const all = [...verifiedCases, ...patternCases]
 
-  // Number oldest-added-first, by addedAt (row insertion time) — NOT
+  // Number oldest-added-first, by addedAt (row insertion time), NOT
   // caseDate (the underlying post's own age). caseDate is arbitrary
   // relative to when a case actually got added: a case pasted today about
   // an old thread would land in the MIDDLE of a caseDate-sorted sequence
@@ -393,7 +393,7 @@ export function buildCases(
     row.caseNumber = index + 1
   })
 
-  // Displayed newest-added-first (addedAt, same basis as caseNumber above —
+  // Displayed newest-added-first (addedAt, same basis as caseNumber above ,
   // keeps the visible order and the # column agreeing with each other,
   // highest number at the top), undated last.
   return all.sort((a, b) => {
@@ -411,7 +411,7 @@ function csvCell(value: string): string {
   return value
 }
 
-/** MM/DD/YYYY, plain text — not a full ISO timestamp, so it doesn't get
+/** MM/DD/YYYY, plain text, not a full ISO timestamp, so it doesn't get
  * reformatted into a datetime-with-offset when the CSV opens in Sheets. */
 function caseDateLabel(value: string | null): string {
   if (!value) return ''

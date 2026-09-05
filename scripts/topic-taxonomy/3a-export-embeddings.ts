@@ -1,6 +1,6 @@
 // Step 3a: dump every embedded post's {id, embedding} to a local JSON file
 // for the Python clustering step. Keeps HDBSCAN's dependency (numpy/sklearn/
-// hdbscan) out of the Node/edge-function world entirely — cluster.py has no
+// hdbscan) out of the Node/edge-function world entirely, cluster.py has no
 // DB credentials and touches nothing but this file and its output.
 //
 // Run:
@@ -26,7 +26,7 @@ if (!supabaseUrl || !serviceRoleKey) {
 
 const supabase = createClient(supabaseUrl, serviceRoleKey)
 
-// PostgREST caps a single response at 1000 rows by default — a plain select
+// PostgREST caps a single response at 1000 rows by default, a plain select
 // silently truncates past that, so this pages through with .range() until a
 // page comes back short.
 const PAGE_SIZE = 1000
@@ -50,7 +50,7 @@ async function fetchAllRows(): Promise<{ id: string; embedding: string | number[
 }
 
 // PostgREST serializes pgvector columns as their string literal
-// ("[0.001,-0.002,...]"), not a JSON array — parse it into real numbers so
+// ("[0.001,-0.002,...]"), not a JSON array, parse it into real numbers so
 // the exported JSON is directly usable by numpy on the Python side.
 function parseEmbedding(raw: string | number[]): number[] {
   if (Array.isArray(raw)) return raw

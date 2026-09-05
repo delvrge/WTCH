@@ -1,5 +1,5 @@
 // One-off backfill: embeds question_summary for every verified_answers row
-// still missing an embedding (pre-migration rows — save-verified now embeds
+// still missing an embedding (pre-migration rows, save-verified now embeds
 // on insert going forward). Run once with:
 //
 //   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... GEMINI_API_KEY=... \

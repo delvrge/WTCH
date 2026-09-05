@@ -1,10 +1,10 @@
 -- Grounding sources for drafted replies.
 --
 -- Authority order, never violated:
---   1. verified_answers — highest. A reply the user actually sent that
+--   1. verified_answers, highest. A reply the user actually sent that
 --      actually worked.
---   2. context_docs     — authoritative reference the user pastes in.
---   3. Forum thread text — signal only. It says what people are ASKING or
+--   2. context_docs    , authoritative reference the user pastes in.
+--   3. Forum thread text, signal only. It says what people are ASKING or
 --      COMPLAINING about; it is never a statement of fact about how the
 --      product works, and is never stored in either of these tables.
 

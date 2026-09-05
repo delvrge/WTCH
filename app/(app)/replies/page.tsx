@@ -16,7 +16,7 @@ interface ReplyForm {
   question_summary: string
   source_url: string
   verified: boolean
-  /** The community_patterns rows (open cases) this reply answers — a reply can cover more than one (verified_answer_cases). Empty = unlinked. */
+  /** The community_patterns rows (open cases) this reply answers, a reply can cover more than one (verified_answer_cases). Empty = unlinked. */
   pattern_ids: string[]
 }
 
@@ -40,22 +40,22 @@ interface CaseOption {
 const UNCLUSTERED_KEY = '__unclustered__'
 
 // A row that has a category but no subcategory still needs a Level-2 tile to
-// live under — this is that catch-all subcategory within a given category,
+// live under, this is that catch-all subcategory within a given category,
 // distinct from the top-level Uncategorized bucket (which is for no category
 // at all).
 const NO_SUBCATEGORY_KEY = '__no_subcategory__'
 
 // The taxonomy stopped being enforced by the database (see the
-// subcategory_free_text migration) — category and subcategory are now both
+// subcategory_free_text migration), category and subcategory are now both
 // plain text. The dropdowns still seed the fixed 9 topics/27 subtopics
 // (existingCategories / existingSubcategoriesByCategory) so Context and
 // Replies always offer the same set, but a reply isn't restricted to
-// it — "+ Add new" introduces anything the fixed list doesn't cover, from a
+// it, "+ Add new" introduces anything the fixed list doesn't cover, from a
 // reply's own Category/Subcategory fields.
 const ADD_NEW = '__add_new__'
 
 // A reply already filed under a category shows only that category plus this
-// option in its Category dropdown — the full list only appears once this is
+// option in its Category dropdown, the full list only appears once this is
 // picked. Prevents a card already inside "Video Generation" from looking
 // like it can casually be dropped onto "Image Generation" at a glance; the
 // operator has to deliberately ask to see other categories first.
@@ -80,14 +80,14 @@ function escapeHtml(text: string): string {
 interface ReplyGroup {
   key: string
   label: string
-  /** Parent topic, off TOPIC_BY_SUBTOPIC — null for Unclustered. */
+  /** Parent topic, off TOPIC_BY_SUBTOPIC, null for Unclustered. */
   topic: string | null
   rows: VerifiedAnswer[]
 }
 
 // Seeds the rich editor when opening an existing reply. A row with
 // answer_html reopens exactly as formatted; a plain legacy row (or an
-// AI-drafted one — stage-ai-drafts/generate-replies never set answer_html)
+// AI-drafted one, stage-ai-drafts/generate-replies never set answer_html)
 // gets its real newlines converted to the same per-line <div> shape typing
 // Enter in the editor would itself produce, so it doesn't collapse into one
 // run the moment it's opened for editing.
@@ -96,8 +96,8 @@ function editableHtmlFromRow(row: VerifiedAnswer): string {
 }
 
 // Checkbox list standing in for a native multi-select. Shows only the
-// currently-linked cases by default — at 45+ open cases, a flat list of
-// everything is nothing an operator can scan — and only searches the full
+// currently-linked cases by default, at 45+ open cases, a flat list of
+// everything is nothing an operator can scan, and only searches the full
 // case list once something is typed, so linking a new case is "search, then
 // check" rather than "scroll the whole thing".
 function CaseMultiSelect({
@@ -117,7 +117,7 @@ function CaseMultiSelect({
     : caseOptions.filter(c => selectedSet.has(c.id))
 
   // caseOptions arrives newest-first (last_seen desc), so its first not-yet-
-  // linked entry is the most recently added open case — a one-click shortcut
+  // linked entry is the most recently added open case, a one-click shortcut
   // for the common "link the case I was just looking at" save, without
   // typing anything into the search box. Hidden the moment a search is
   // typed, so it never fights the actual filtered results.
@@ -171,7 +171,7 @@ function CaseMultiSelect({
 }
 
 // One reply, always shown in its full editable shape (Category, Subcategory,
-// Question, Answer, Linked cases) — there is no separate "view" mode to
+// Question, Answer, Linked cases), there is no separate "view" mode to
 // click into Edit from. Local state seeds once from `row` and `linkedIds` on
 // mount (this instance is keyed by row.id in the parent list, so a genuinely
 // different reply gets a fresh instance) and Save persists all of it in one
@@ -198,7 +198,7 @@ function ReplyCard({
   row: VerifiedAnswer
   linkedIds: string[]
   caseOptions: CaseOption[]
-  /** Every category a reply already carries — what the Category dropdown offers, not the fixed taxonomy. */
+  /** Every category a reply already carries, what the Category dropdown offers, not the fixed taxonomy. */
   existingCategories: string[]
   /** Same, one subcategory list per category, off the same live reply data. */
   existingSubcategoriesByCategory: Map<string, string[]>
@@ -209,7 +209,7 @@ function ReplyCard({
   copied: boolean
   setRef: (el: HTMLDivElement | null) => void
   onToggleVerified: () => void
-  /** Links/unlinks a case immediately (its own write, not part of Save) — see the parent's toggleCaseLink doc comment. */
+  /** Links/unlinks a case immediately (its own write, not part of Save), see the parent's toggleCaseLink doc comment. */
   onToggleCase: (patternId: string, checked: boolean) => void
   onCopy: () => void
   onDelete: () => void
@@ -218,14 +218,14 @@ function ReplyCard({
 }) {
   const editorRef = useRef<RichTextEditorHandle>(null)
   const [category, setCategory] = useState(row.category || '')
-  // A legacy row can carry a category with no subcategory at all — every
+  // A legacy row can carry a category with no subcategory at all, every
   // reply should be filed under a real subcategory, so default to the
   // category's first known one rather than leaving this blank.
   const [subcategory, setSubcategory] = useState(
     row.subcategory || existingSubcategoriesByCategory.get(row.category || '')?.[0] || '',
   )
   // Whether the Category dropdown is showing the full list of categories to
-  // move this reply into, rather than just its current one — see MOVE_TO_OTHER.
+  // move this reply into, rather than just its current one, see MOVE_TO_OTHER.
   const [pickingCategory, setPickingCategory] = useState(false)
   const [questionSummary, setQuestionSummary] = useState(row.question_summary)
   const [saving, setSaving] = useState(false)
@@ -249,7 +249,7 @@ function ReplyCard({
         question_summary,
         reply_text: answer_text,
         answer_html: answerHtml,
-        // pattern_ids omitted on purpose — linked cases now save immediately
+        // pattern_ids omitted on purpose, linked cases now save immediately
         // via onToggleCase, not as part of this button. Sending it here
         // would re-sync against whatever this instance's props say, which is
         // redundant at best and a stale overwrite at worst.
@@ -274,7 +274,7 @@ function ReplyCard({
           className={`verify-toggle${row.verified ? ' verify-toggle-on' : ''}`}
           role="switch"
           aria-checked={row.verified}
-          title={row.verified ? 'Verified — click to unverify' : 'Not verified — click to verify'}
+          title={row.verified ? 'Verified, click to unverify' : 'Not verified, click to verify'}
           onClick={onToggleVerified}
         >
           <span className="verify-toggle-knob" />
@@ -314,7 +314,7 @@ function ReplyCard({
               // A leftover subcategory from the previous category would
               // silently point at the wrong one. Default to the new
               // category's first known subcategory instead of leaving this
-              // blank — there is no "None" to fall back to.
+              // blank, there is no "None" to fall back to.
               const subtopics = existingSubcategoriesByCategory.get(next) ?? []
               if (!subtopics.includes(subcategory)) setSubcategory(subtopics[0] ?? '')
             }}
@@ -422,12 +422,12 @@ function ReplyCard({
 
 export default function RepliesPage() {
   const [rows, setRows] = useState<VerifiedAnswer[]>([])
-  // Open cases (community_patterns) to link a reply to — the Library screen
+  // Open cases (community_patterns) to link a reply to, the Library screen
   // is pure case tracking now, so this is the only place left to associate a
   // reply with the post it answers, other than the automatic pattern_id a
   // saved Dashboard draft or a staged AI draft already arrives with.
   const [caseOptions, setCaseOptions] = useState<CaseOption[]>([])
-  // Raw verified_answer_cases rows — the many-to-many link between a reply
+  // Raw verified_answer_cases rows, the many-to-many link between a reply
   // and the case(s) it answers. patternIdsByAnswerId below is the shape
   // everything else actually reads.
   const [caseLinks, setCaseLinks] = useState<VerifiedAnswerCase[]>([])
@@ -435,7 +435,7 @@ export default function RepliesPage() {
   const [signedUrls, setSignedUrls] = useState<Map<string, string>>(new Map())
   const [error, setError] = useState('')
 
-  // Categories created via "Add category" ahead of any reply using them —
+  // Categories created via "Add category" ahead of any reply using them ,
   // reply_categories rows. Merged into existingCategories below alongside
   // whatever verified_answers.category already has in use, so a freshly
   // created one is immediately pickable in the Category dropdown.
@@ -443,13 +443,13 @@ export default function RepliesPage() {
   const [addingCategory, setAddingCategory] = useState(false)
 
 
-  // Manual entry — a reply the operator already knows works (answered
+  // Manual entry, a reply the operator already knows works (answered
   // elsewhere, remembered from experience) with no AI draft or thread
   // behind it. Goes through save-verified (same function ReplyBlock's "Save
   // to Replies" calls) rather than a raw insert, so the question_summary
-  // gets embedded — without that, match_verified_answers never surfaces the
+  // gets embedded, without that, match_verified_answers never surfaces the
   // row and it's saved but effectively unsearchable. `tracked` gates
-  // whether it also grounds/gets cited in future drafts — a plain personal
+  // whether it also grounds/gets cited in future drafts, a plain personal
   // record doesn't have to become a source.
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState<ReplyForm>(EMPTY_FORM)
@@ -508,7 +508,7 @@ export default function RepliesPage() {
         setCreatedCategories([])
       }
 
-      // Open cases to offer in the "Linked cases" picker — same inclusion
+      // Open cases to offer in the "Linked cases" picker, same inclusion
       // rule as the Library's case list (not rejected), newest first.
       const { data: patternRows, error: patternError } = await supabaseClient()
         .from('community_patterns')
@@ -567,7 +567,7 @@ export default function RepliesPage() {
   }, [load])
 
   // Signed URLs are generated on load and never persisted (the bucket is
-  // private) — re-derive whenever the set of known image paths changes.
+  // private), re-derive whenever the set of known image paths changes.
   const allPaths = useMemo(() => {
     const paths: string[] = []
     for (const list of imagesByAnswer.values()) {
@@ -604,7 +604,7 @@ export default function RepliesPage() {
     return map
   }, [caseLinks])
 
-  // What the Category/Subcategory dropdowns actually offer — every category
+  // What the Category/Subcategory dropdowns actually offer, every category
   // and subcategory a reply already carries, live off `rows`, not the fixed
   // 9/27 taxonomy. New ones only enter this set via "+ Add new…" on a
   // reply's own fields, then show up here once saved and reloaded.
@@ -632,7 +632,7 @@ export default function RepliesPage() {
   }, [rows])
 
   // Keyed by the actual category+subcategory pair a reply carries (both free
-  // text now — see the subcategory_free_text/reply_categories migrations),
+  // text now, see the subcategory_free_text/reply_categories migrations),
   // not the old fixed 9/27 taxonomy. A row with a category but no
   // subcategory still needs somewhere to live under that category (see
   // NO_SUBCATEGORY_KEY); only a row with NO category at all falls all the
@@ -672,7 +672,7 @@ export default function RepliesPage() {
   const openBox = openBoxKey ? groups.find(g => g.key === openBoxKey) || null : null
 
   // Top-level grid: one tile per topic that has at least one populated
-  // subtopic, plus Unclustered — same shape as before subcategories existed
+  // subtopic, plus Unclustered, same shape as before subcategories existed
   // one level down. Unclustered has no subcategories of its own, so its tile
   // leads straight to its replies rather than to an empty subcategory grid.
   interface CategoryGroup {
@@ -684,11 +684,11 @@ export default function RepliesPage() {
   const categoryGroups = useMemo<CategoryGroup[]>(() => {
     const byTopic = new Map<string, { replyCount: number; subtopicCount: number }>()
     // Every Context category (the fixed 9-topic taxonomy) gets a tile up
-    // front, even with zero replies — Context and Replies must show the same
+    // front, even with zero replies, Context and Replies must show the same
     // set of categories, not just whichever ones happen to have a reply yet.
     for (const name of TOPICS) byTopic.set(name, { replyCount: 0, subtopicCount: 0 })
     // Every category created via "Add category" gets a tile up front too,
-    // even with zero replies — that's the whole point of registering one
+    // even with zero replies, that's the whole point of registering one
     // ahead of time (see the reply_categories migration).
     for (const name of createdCategories) if (!byTopic.has(name)) byTopic.set(name, { replyCount: 0, subtopicCount: 0 })
     for (const g of groups) {
@@ -708,11 +708,11 @@ export default function RepliesPage() {
     ]
   }, [groups, createdCategories])
 
-  // Subcategory tiles for whichever topic is open — Unclustered never
+  // Subcategory tiles for whichever topic is open, Unclustered never
   // reaches this view (its tile opens replies directly), so this only ever
   // renders for a real topic.
   // Same "seed from the fixed taxonomy, overlay real rows" shape as
-  // categoryGroups above — a fixed subtopic gets its tile the moment its
+  // categoryGroups above, a fixed subtopic gets its tile the moment its
   // parent category is open, not just once a reply lands in it.
   const subtopicGroups = useMemo(() => {
     if (!openTopicKey) return []
@@ -748,7 +748,7 @@ export default function RepliesPage() {
   // Reads ?reply=<verified_answers.id> from the URL once groups are ready,
   // opens the box that reply lives in (plus its parent category, so the
   // back button lands somewhere sensible) and flags it to flash+scroll into
-  // view. A ref (not state) gates this to a single attempt per page load —
+  // view. A ref (not state) gates this to a single attempt per page load ,
   // re-running on every groups update (e.g. after a Verify toggle) would
   // reopen the box the operator just navigated away from.
   useEffect(() => {
@@ -758,13 +758,13 @@ export default function RepliesPage() {
     deepLinkApplied.current = true
     if (!targetId) return
     const group = groups.find(g => g.rows.some(r => r.id === targetId))
-    if (!group) return // stale link — the reply no longer exists
+    if (!group) return // stale link, the reply no longer exists
     setOpenTopicKey(group.topic ?? UNCLUSTERED_KEY)
     setOpenBoxKey(group.key)
     setHighlightId(targetId)
   }, [dataReady, groups])
 
-  // Reads ?newFor=<CaseRow.id> from the URL once caseOptions are ready — the
+  // Reads ?newFor=<CaseRow.id> from the URL once caseOptions are ready, the
   // Cases table's "No reply" chip lands here to compose a reply for that
   // case directly, instead of the bare grid. Pre-fills question/source/link
   // from the matching open case so the operator isn't hunting for it again
@@ -789,7 +789,7 @@ export default function RepliesPage() {
   }, [dataReady, caseOptions])
 
   // Scrolls the flagged reply into view once its box is open and rendered,
-  // then clears the flash after a couple seconds — it's an arrival cue, not
+  // then clears the flash after a couple seconds, it's an arrival cue, not
   // a permanent state.
   useEffect(() => {
     if (!highlightId) return
@@ -798,11 +798,11 @@ export default function RepliesPage() {
     return () => window.clearTimeout(timer)
   }, [highlightId, openBoxKey])
 
-  // Put the whole reply — text and its images — on the clipboard in one go,
+  // Put the whole reply, text and its images, on the clipboard in one go,
   // so pasting into the forum's rich editor carries both. text/html is what
   // a rich editor consumes; text/plain is the fallback for anywhere that
   // doesn't. A rich reply's images are already inline data URIs inside
-  // answer_html (see RichTextEditor) — legacy verified_answer_images
+  // answer_html (see RichTextEditor), legacy verified_answer_images
   // attachments (pre-existing rows only; the editor no longer writes new
   // ones) are fetched and appended as base64 too, so the paste stays intact
   // after their signed URLs would have expired.
@@ -839,7 +839,7 @@ export default function RepliesPage() {
     }
   }
 
-  // One-click verify/unverify — separate from the edit form's checkbox so
+  // One-click verify/unverify, separate from the edit form's checkbox so
   // reviewing an AI draft (the common case) doesn't require opening Edit
   // first. Flips the green-border state and, since match_verified_answers
   // and loadGrounding both gate on this column, whether the row can ground
@@ -860,12 +860,12 @@ export default function RepliesPage() {
     }
   }
 
-  // Links/unlinks one case immediately — its own write to
+  // Links/unlinks one case immediately, its own write to
   // verified_answer_cases, same "no Save button needed" convention as
   // toggleVerified above. Previously this only updated local form state and
   // was folded into the big Save call, which meant unchecking a case here
   // did nothing until Save was clicked (and if the operator only edited the
-  // link, nothing else told them a click was still required) — the reply
+  // link, nothing else told them a click was still required), the reply
   // stayed linked, and the case kept showing its Verified badge on Library.
   async function toggleCaseLink(answerId: string, patternId: string, checked: boolean) {
     const prevLinks = caseLinks
@@ -884,7 +884,7 @@ export default function RepliesPage() {
         const { error: insertError } = await supabaseClient()
           .from('verified_answer_cases')
           .insert({ answer_id: answerId, pattern_id: patternId, user_id: user.id })
-        // Already linked (unique violation) is not an error — same tolerance the old picker had.
+        // Already linked (unique violation) is not an error, same tolerance the old picker had.
         if (insertError && insertError.code !== '23505') throw new Error(insertError.message)
       } else {
         const { error: deleteError } = await supabaseClient()
@@ -921,7 +921,7 @@ export default function RepliesPage() {
     setAdding(true)
   }
 
-  // Registers a category ahead of any reply using it — reply_categories has
+  // Registers a category ahead of any reply using it, reply_categories has
   // no delete policy yet (not implemented on purpose), so this only ever
   // adds. An existing name just fails the unique constraint quietly; no need
   // to check first.
@@ -986,7 +986,7 @@ export default function RepliesPage() {
   }
 
   // Legacy-only: removes a pre-existing verified_answer_images attachment.
-  // Nothing writes new rows into that table any more — an image added
+  // Nothing writes new rows into that table any more, an image added
   // through the rich editor lives inline in answer_html instead.
   async function removeImage(row: VerifiedAnswer, image: VerifiedAnswerImage) {
     if (!confirm('Remove this image?')) return

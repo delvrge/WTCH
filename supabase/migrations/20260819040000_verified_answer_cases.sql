@@ -1,11 +1,11 @@
 -- Adds a many-to-many join table alongside verified_answers.pattern_id (a
--- reply could point at at most one case) — the same reply text (e.g. "our
+-- reply could point at at most one case), the same reply text (e.g. "our
 -- servers are melting, standby") is routinely the correct answer for
 -- several different posts, and a case can pick up more than one reply over
 -- time. Mirrors verified_answer_images' shape/RLS style, the existing child
 -- table for this same parent.
 --
--- Deliberately does NOT touch verified_answers.pattern_id — this migration
+-- Deliberately does NOT touch verified_answers.pattern_id, this migration
 -- only adds and backfills the new table, so old code (still reading/writing
 -- the column) keeps working right up until the new code deploys. The column
 -- itself is dropped in a separate later migration
@@ -34,7 +34,7 @@ CREATE POLICY "users_insert_own_verified_answer_cases"
 CREATE POLICY "users_delete_own_verified_answer_cases"
   ON public.verified_answer_cases FOR DELETE
   USING (auth.uid() = user_id);
--- No UPDATE policy: a link either exists or it doesn't — changed by
+-- No UPDATE policy: a link either exists or it doesn't, changed by
 -- deleting one row and inserting another, never edited in place.
 
 CREATE INDEX verified_answer_cases_answer_id_idx  ON public.verified_answer_cases (answer_id);
@@ -42,7 +42,7 @@ CREATE INDEX verified_answer_cases_pattern_id_idx ON public.verified_answer_case
 CREATE INDEX verified_answer_cases_user_id_idx    ON public.verified_answer_cases (user_id);
 
 -- Backfill every existing single link before the column that held it goes
--- away. FK is ON DELETE CASCADE here (unlike the old column's SET NULL) —
+-- away. FK is ON DELETE CASCADE here (unlike the old column's SET NULL) ,
 -- a join row's only reason to exist is the pairing itself; a reply or
 -- pattern disappearing leaves nothing for it to mean.
 INSERT INTO public.verified_answer_cases (answer_id, pattern_id, user_id)
